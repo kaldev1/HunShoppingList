@@ -1,0 +1,543 @@
+<html><head><base href="https://websim.ai/c/shopopedia"><title>Shopopedia - Your Smart Shopping List</title><meta name="viewport" content="width=device-width, initial-scale=1.0"><style>
+  body {
+    font-family: 'Roboto', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f0f0f0;
+  }
+  .app-container {
+    max-width: 800px;
+    margin: 0 auto;
+    background-color: #ffffff;
+    min-height: 100vh;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  }
+  header {
+    background-color: #4CAF50;
+    color: white;
+    text-align: center;
+    padding: 1rem;
+  }
+  h1 {
+    margin: 0;
+    font-size: 1.5rem;
+  }
+  .add-item {
+    display: flex;
+    flex-direction: column;
+    padding: 1rem;
+    background-color: #E8F5E9;
+  }
+  #new-items {
+    flex-grow: 1;
+    padding: 0.5rem;
+    font-size: 1rem;
+    border: 1px solid #4CAF50;
+    border-radius: 4px;
+    min-height: 100px;
+    margin-bottom: 0.5rem;
+  }
+  .button-group {
+    display: flex;
+    justify-content: space-between;
+  }
+  #add-button, #reorder-button {
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    flex-grow: 1;
+    margin: 0 0.25rem;
+  }
+  #add-button {
+    background-color: #4CAF50;
+  }
+  #reorder-button {
+    background-color: #2196F3;
+  }
+  #shopping-list {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+  }
+  .list-item {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    border-bottom: 1px solid #e0e0e0;
+  }
+  .list-item:last-child {
+    border-bottom: none;
+  }
+  .item-text {
+    flex-grow: 1;
+    margin-left: 0.5rem;
+  }
+  .delete-button {
+    background-color: #f44336;
+    color: white;
+    border: none;
+    padding: 0.5rem;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  .completed {
+    text-decoration: line-through;
+    color: #888;
+  }
+  .category-header {
+    background-color: #E8F5E9;
+    padding: 0.5rem;
+    font-weight: bold;
+    text-transform: capitalize;
+  }
+</style></head><body>
+<div class="app-container">
+  <header>
+    <h1>Shopopedia</h1>
+  </header>
+  <div class="add-item">
+    <textarea id="new-items" placeholder="Add items to your list (one per line)"></textarea>
+    <div class="button-group">
+      <button id="add-button">Add Items</button>
+      <button id="reorder-button">Reorder Items</button>
+    </div>
+  </div>
+  <ul id="shopping-list"></ul>
+</div>
+<script>
+  const newItemsTextarea = document.getElementById('new-items');
+  const addButton = document.getElementById('add-button');
+  const reorderButton = document.getElementById('reorder-button');
+  const shoppingList = document.getElementById('shopping-list');
+
+  // Load items from local storage
+  let items = JSON.parse(localStorage.getItem('shoppingList')) || [];
+
+  const categories = {
+  zoldseg: [
+    'paradicsom', 'uborka', 'paprika', 'répa', 'hagyma', 'fokhagyma', 'burgonya', 'saláta', 'káposzta', 'brokkoli', 
+    'karfiol', 'cukkini', 'padlizsán', 'spenót', 'cékla', 'zöldbab', 'kukorica', 'tök', 'zeller', 'karalábé', 
+    'retek', 'spárga', 'articsóka', 'paszternák', 'petrezselyem', 'metélőhagyma', 'mángold', 'kelkáposzta', 'édeskömény', 'zöldborsó',
+    'Bonduelle konzerv kukorica', 'Globus konzerv zöldborsó', 'Eisberg salátakeverék', 'csiperke gomba', 'laska gomba', 'shiitake gomba',
+    'lilahagyma', 'újhagyma', 'póréhagyma', 'rukkola', 'jégsaláta', 'római saláta', 'fejes saláta', 'endívia', 'sütőtök', 'patisszon',
+    'zöldfűszerek', 'bazsalikom', 'oregánó', 'kakukkfű', 'rozmaring', 'koriander', 'kapor', 'snidling', 'zsázsa', 'menta',
+    'sárgarépa', 'fehérrépa', 'fekete retek', 'hónapos retek', 'kínai kel', 'bambuszrügy', 'csírák', 'torma', 'wasabi',
+    'Bonduelle konzerv bab', 'Bonduelle konzerv lencse', 'Rege konzerv csemegeuborka', 'Rege konzerv cékla', 'Univer savanyúság',
+    'bio zöldségek', 'mikrozöldek', 'fagyasztott zöldségkeverék', 'leveszöldség', 'grillzöldség', 'salátamix', 'bébirépa',
+    'koktélparadicsom', 'fürtös pararadicsom', 'szilva paradicsom', 'zöld paradicsom', 'padlizsánkrém', 'guacamole', 'humusz'
+  ],
+  gyumolcs: [
+    'alma', 'banán', 'narancs', 'citrom', 'körte', 'szőlő', 'eper', 'málna', 'áfonya', 'dinnye', 
+    'barack', 'szilva', 'ananász', 'kiwi', 'mangó', 'cseresznye', 'ribizli', 'grapefruit', 'füge', 'datolya', 
+    'avokádó', 'gránátalma', 'maracuja', 'licsi', 'mandarin', 'nektarin', 'kókuszdió', 'sárgadinnye', 'papaya', 'guava',
+    'Chiquita banán', 'Golden Delicious alma', 'Dole ananász', 'pomelo', 'kumquat', 'csillaggyümölcs', 'pitaya', 'durián',
+    'sárgabarack', 'őszibarack', 'meggy', 'egres', 'fekete ribizli', 'piros ribizli', 'naspolya', 'csipkebogyó', 'kökény', 'som',
+    'birsalma', 'ringló', 'vörös áfonya', 'fekete áfonya', 'szeder', 'homoktövis', 'galagonya', 'berkenye', 'arónia',
+    'zöld citrom', 'yuzu', 'ugli', 'tangelo', 'Buddha keze citrom', 'vérnarancs', 'klementin', 'tangerin', 'pomelo',
+    'Granny Smith alma', 'Jonagold alma', 'Idared alma', 'Gala alma', 'Red Delicious alma', 'Fuji alma', 'Pink Lady alma',
+    'muskotályszőlő', 'csemegeszőlő', 'magnélküli szőlő', 'fekete szőlő', 'piros szőlő', 'fehér szőlő',
+    'görögdinnye', 'sárgadinnye', 'kantalup dinnye', 'Galia dinnye', 'mézdinnye',
+    'aszalt gyümölcsök', 'mazsola', 'aszalt sárgabarack', 'aszalt szilva', 'aszalt áfonya', 'datolya', 'füge',
+    'kandírozott gyümölcsök', 'koktélcseresznye', 'gyümölcssaláta', 'trópusi gyümölcskeverék',
+    'bio gyümölcsök', 'szezonális gyümölcsök', 'héjasgyümölcsök', 'dió', 'mogyoró', 'mandula', 'pisztácia', 'kesudió', 'pekándió'
+  ],
+  tejtermek: [
+    'tej', 'sajt', 'joghurt', 'vaj', 'tejföl', 'túró', 'kefir', 'tejszín', 'cottage cheese', 'mascarpone', 
+    'mozzarella', 'parmezán', 'feta', 'ricotta', 'camembert', 'brie', 'ementáli', 'krémsajt', 'görög joghurt', 'aludttej', 
+    'író', 'tejpor', 'Danone Activia joghurt', 'Danette puding', 'Milli tejföl', 'Pöttyös Túró Rudi', 'Kinder Pingui',
+    'Tolle UHT tej', 'Nádudvari túró', 'Zott Jogobella', 'Pannónia sajt', 'Medve sajt', 'Karaván sajt', 'Tihany Camembert',
+    'Mizo tejföl', 'Mizo tejszín', 'Mizo kefir', 'Mizo laktózmentes tej', 'Mizo protein ital', 'Mizo tejberizs',
+    'Parmalat tej', 'Parmalat tejszín', 'Sole-Mizo trappista sajt', 'Sole-Mizo mozzarella', 'Sole-Mizo vajkrém',
+    'Kőröstej Hajdú sajt', 'Kőröstej grillsajt', 'Tolnatej trappista', 'Tolnatej vajkrém', 'Tolnatej tejföl',
+    'Óvártej Óvári sajt', 'Óvártej Karaván sajt', 'Óvártej Pannónia sajt', 'Óvártej Trappista sajt',
+    'Alföldi Tej ESL tej', 'Alföldi Tej kaukázusi kefir', 'Alföldi Tej natúr joghurt', 'Alföldi Tej túró',
+    'Pilos UHT tej', 'Pilos tejföl', 'Pilos joghurt', 'Pilos kefir', 'Pilos sajt', 'Pilos vaj',
+    'Magic Milk laktózmentes termékek', 'Alpro szójatej', 'Alpro mandulatej', 'Alpro kókusztej', 'Alpro zabtej',
+    'Müller Riso tejberizs', 'Müller Milch shake', 'Ehrmann High Protein Pudding', 'Ehrmann Almighurt',
+    'Danone Oikos görög joghurt', 'Danone Actimel', 'Danone Danonino', 'Hochland sajtszeletek', 'Hochland krémsajt',
+    'Philadelphia krémsajt', 'Rama margarin', 'Delma margarin', 'Flora margarin', 'Becel margarin',
+    'Lurpak vaj', 'Kerrygold ír vaj', 'Meggle vajkrém', 'President vaj', 'President camembert',
+    'Galbani mozzarella', 'Galbani mascarpone', 'Galbani ricotta', 'Gran Moravia parmezán', 'Grana Padano',
+    'Arla sajt', 'Arla vaj', 'Arla tejszín', 'Arla krémsajt', 'Savencia Karikas sajt', 'Savencia Medve sajt'
+  ],
+  pekaru: [
+    'kenyér', 'zsemle', 'kifli', 'bagett', 'pita', 'tortilla', 'croissant', 'kalács', 'péksütemény', 'toast kenyér', 
+    'ciabatta', 'focaccia', 'briós', 'pogácsa', 'perec', 'muffin', 'palacsinta', 'rétes', 'pizza alap', 'hamburger zsemle', 
+    'Lipóti kenyér', 'Fornetti pogácsa', 'Ceres toast kenyér', 'Rádi pékség croissant', 'teljes kiőrlésű kenyér',
+    'rozskenyér', 'tönkölykenyér', 'magvas kenyér', 'kovászos kenyér', 'bagel', 'angol muffin', 'hot dog kifli',
+    'kakaós csiga', 'lekváros bukta', 'túrós táska', 'almás rétes', 'meggyes rétes', 'mákos bejgli', 'diós bejgli',
+    'sajtos pogácsa', 'tepertős pogácsa', 'burgonyás pogácsa', 'leveles tészta', 'piskóta', 'piskóta tekercs',
+    'kuglóf', 'gyümölcskenyér', 'csokis muffin', 'áfonyás muffin', 'vaníliás croissant', 'csokis croissant',
+    'fahéjas csiga', 'sajtos rúd', 'sós perec', 'édes perec', 'fonott kalács', 'briós', 'hamburger zsemle',
+    'hot dog kifli', 'szendvics kenyér', 'pirítós kenyér', 'graham kenyér', 'korpás zsemle', 'molnárka',
+    'császárzsemle', 'vizes zsemle', 'szezámmagos zsemle', 'tökmagos zsemle', 'sósperec', 'ropi',
+    'grissini', 'kenyérchips', 'pizzatészta', 'naan kenyér', 'pide', 'lavash', 'matzo', 'chapati',
+    'gluténmentes kenyér', 'gluténmentes zsemle', 'gluténmentes kifli', 'paleo kenyér', 'protein kenyér',
+    'Abonett extrudált kenyér', 'Balviten gluténmentes pékáru', 'Schär gluténmentes termékek',
+    'Bonduelle konzerv kukorica', 'Globus konzerv zöldborsó', 'Eisberg salátakeverék',
+    'Első Pesti Malom lisztek', 'Szarvasi Malom lisztek', 'Goodmills lisztek',
+    'Dénes-Natura pékáruk', 'Mantler pékáruk', 'Kemencés pékség termékei', 'Jókenyér pékség termékei',
+    'Panelkom félkész pékáruk', 'Schulstad Bakery Solutions pékáruk', 'Vandemoortele fagyasztott pékáruk'
+  ],
+  hus: [
+    'csirke', 'pulyka', 'marha', 'sertés', 'bárány', 'hal', 'lazac', 'tonhal', 'kolbász', 'szalámi', 
+    'sonka', 'bacon', 'kacsa', 'nyúl', 'borjú', 'vadhús', 'füstölt hús', 'virsli', 'májkrém', 'pástétom', 
+    'csirkemell', 'sertéskaraj', 'marhafelsál', 'darált hús', 'Pick szalámi', 'Gyulai kolbász', 'Sága füstli', 'Zimbo sonka',
+    'Globus májkrém', 'csirkecomb', 'csirkeszárny', 'pulykamell', 'pulykacomb', 'kacsacomb', 'kacsemell',
+    'sertéstarja', 'sertéslapocka', 'sertéscomb', 'marhahátszín', 'marhabélszín', 'marhanyak', 'báránygerinc',
+    'báránycomb', 'pácolt csirkemell', 'pácolt sertéstarja', 'füstölt csülök', 'füstölt tarja', 'füstölt oldalas',
+    'csemege szalámi', 'téliszalámi', 'turista szalámi', 'paprikás szalámi', 'csabai kolbász', 'debreceni kolbász',
+    'lecsókolbász', 'hurka', 'véres hurka', 'májas hurka', 'disznósajt', 'abált szalonna', 'császárszalonna',
+    'angolszalonna', 'tepertő', 'zsír', 'libamáj', 'kacsamáj', 'csirkemáj', 'marhanyelvv', 'pacal', 'velő',
+    'belsőség', 'csontvelő', 'füstölt csülök', 'füstölt tarja', 'füstölt oldalas', 'főtt-füstölt tarja',
+    'parizer', 'mortadella', 'zala felvágott', 'olasz felvágott', 'gépsonka', 'prágai sonka', 'serano sonka',
+    'schwarzwaldi sonka', 'pármai sonka', 'bayonne sonka', 'jamon iberico', 'bresaola', 'pancetta',
+    'szalámirúd', 'chorizo', 'pepperoni', 'pastrami', 'corned beef', 'roastbeef', 'pulled pork', 'pulled chicken',
+    'csirkemell sonka', 'pulykamell sonka', 'csirke nuggets', 'csirke cordon bleu', 'rántott hús', 'saslik', 'kebab',
+    'hamburger pogácsa', 'marhapogácsa', 'csirkepogácsa', 'növényi alapú húshelyettesítő',
+    'Pick Téliszalámi', 'Pick Békebeli kolbász', 'Pick Rákóczi szalámi', 'Herz szalámi', 'Herz Minizán',
+    'Kaiser sonka', 'Kométa sonka', 'Kométa szalámi', 'Wiesbauer sonkák', 'Wiesbauer felvágottak',
+    'Spar Budget virsli', 'Spar Budget párizsi', 'Spar Budget sonka', 'Spar Budget szalámi',
+    'Lidl Pikok színhús sonka', 'Lidl Pikok szalámi', 'Lidl Pikok virsli',
+    'Aldi Kokárdás termékek', 'Tesco sajátmárkás húskészítmények',
+    'Landhof grillkolbász', 'Landhof virsli', 'Pápai húskészítmények', 'Nagyi Titka húskészítmények',
+    'Ahida csirkemell sonka', 'Ahida pulykamell sonka', 'Ahida gépsonka',
+    'Nádudvari tanyasi csirke', 'Nádudvari pulykamell', 'Nádudvari darált hús',
+    'Galla sonka', 'Galla szalámi', 'Galla kolbász', 'Szilváshús termékek',
+    'Hungerit csirketermékek', 'Valdor csirketermékek', 'Sága pulykasonka',
+    'Gyermelyi csirkemell', 'Gyermelyi pulykamell', 'Gyulai Húskombinát termékek'
+  ],
+  fagyasztott: [
+    'jégkrém', 'fagyasztott zöldség', 'fagyasztott gyümölcs', 'fagyasztott pizza', 'fagyasztott hús', 'fagyasztott tészta', 
+    'fagyasztott készétel', 'fagyasztott hal', 'fagyasztott sütemény', 'fagyasztott pékáru', 'fagyasztott gyümölcskeverék', 
+    'fagyasztott burger', 'fagyasztott hasábburgonya', 'fagyasztott garnéla', 'Häagen-Dazs jégkrém', 'Iglo halrudak', 
+    'Findus fagyasztott zöldségkeverék', 'Dr. Oetker fagyasztott pizza', 'McCain hasábburgonya', 'Algida jégkrém',
+    'Carte DOr jégkrém', 'Ben & Jerry\'s jégkrém', 'Magnum jégkrém', 'Cornetto jégkrém',
+    'fagyasztott csirkemell', 'fagyasztott marha', 'fagyasztott sertés', 'fagyasztott hal filé',
+    'fagyasztott lazac', 'fagyasztott tonhal', 'fagyasztott tintahal', 'fagyasztott garnéla',
+    'fagyasztott zöldborsó', 'fagyasztott kukorica', 'fagyasztott spenót', 'fagyasztott brokkoli',
+    'fagyasztott karfiol', 'fagyasztott vegyes zöldség', 'fagyasztott gyümölcskeverék',
+    'fagyasztott málna', 'fagyasztott eper', 'fagyasztott meggy', 'fagyasztott áfonya',
+    'fagyasztott gombóc', 'fagyasztott nudli', 'fagyasztott galuska', 'fagyasztott nokedli',
+    'fagyasztott lángos', 'fagyasztott rétes', 'fagyasztott pogácsa', 'fagyasztott croissant',
+    'fagyasztott lasagne', 'fagyasztott rakott krumpli', 'fagyasztott túrós tészta',
+    'fagyasztott húsleves', 'fagyasztott zöldségleves', 'fagyasztott gyümölcsleves',
+    'Mirelite fagyasztott termékek', 'Bonduelle fagyasztott zöldségek',
+    'Fevita fagyasztott zöldségek', 'Ardo fagyasztott zöldségek',
+    'Iglo fagyasztott halak', 'Iglo fagyasztott zöldségek', 'Iglo fagyasztott készételek',
+    'Frosta fagyasztott termékek', 'Eismann fagyasztott ételek',
+    'Schöller jégkrém', 'Mövenpick jégkrém', 'Boci jégkrém', 'Kaktusz jégkrém',
+    'Ardo fagyasztott gyümölcsök', 'Spar fagyasztott termékek', 'Tesco fagyasztott termékek',
+    'Lidl fagyasztott termékek', 'Aldi fagyasztott termékek'
+  ],
+  szarazaruk: [
+    'tészta', 'rizs', 'müzli', 'zabpehely', 'liszt', 'cukor', 'só', 'olaj', 'ecet', 'konzervek', 
+    'lekvár', 'méz', 'bab', 'lencse', 'csicseriborsó', 'kókuszreszelék', 'makaróni', 'spagetti', 'kuszkusz', 'bulgur', 
+    'quinoa', 'szójaszósz', 'paradicsompüré', 'instant leves', 'Gyermelyi tészta', 'Uncle Ben\'s rizs', 
+    'Cerbona müzli', 'Diamant cukor', 'Vegeta ételízesítő', 'Knorr leveskocka', 'Maggi ételízesítő',
+    'penne', 'fusilli', 'farfalle', 'lasagne lap', 'cannelloni', 'tagliatelle', 'gnocchi',
+    'kuszkusz', 'bulgur', 'hajdina', 'köles', 'amaránt', 'quinoa', 'vadrizs',
+    'Graham liszt', 'rozsliszt', 'tönkölyliszt', 'rizsliszt', 'kukoricaliszt', 'mandulaliszt',
+    'kókuszliszt', 'burgonyakeményítő', 'kukoricakeményítő', 'pudingpor', 'vaníliás cukor',
+    'porcukor', 'barnacukor', 'nádcukor', 'kókuszvirág cukor', 'xilit', 'eritrit', 'stevia',
+    'napraforgóolaj', 'olívaolaj', 'kókuszolaj', 'lenmagolaj', 'szőlőmagolaj', 'szezámolaj',
+    'balzsamecet', 'almaecet', 'rizsecet', 'fehérborecet', 'vörösborecet',
+    'sűrített paradicsom', 'hámozott paradicsom', 'paradicsompüré', 'ketchup', 'majonéz',
+    'mustár', 'wasabi', 'szójaszósz', 'édes chili szósz', 'barbecue szósz', 'Worcester szósz',
+    'tahini', 'mogyoróvaj', 'Nutella', 'baracklekvár', 'eperlekvár', 'szilvalekvár',
+    'méz', 'akácméz', 'repceméz', 'hársméz', 'vegyes virágméz', 'manuka méz',
+    'tonhalkonzerv', 'szardíniakonzerv', 'makrélakonzerv', 'lazackonzerv',
+    'zöldborsókonzerv', 'kukoricakonzerv', 'babkonzerv', 'csicseriborsókonzerv', 'lencskonzerv',
+    'ananászkonzerv', 'őszibarackkonzerv', 'cseresznyebefőtt', 'meggybefőtt',
+    'Univer ketchup', 'Univer majonéz', 'Univer mustár', 'Globus ketchup', 'Globus mustár',
+    'Heinz ketchup', 'Hellmann\'s majonéz', 'Maille mustár',
+    'Barilla tészta', 'De Cecco tészta', 'Buitoni tészta',
+    'Riceland rizs', 'Scotti rizs', 'Rapunzel bio termékek',
+    'Dr. Oetker pudingpor', 'Dr. Oetker sütőpor', 'Dr. Oetker vaníliás cukor',
+    'Kotányi fűszerek', 'Horváth Rozi fűszerek', 'Lucullus fűszerek',
+    'Spar Budget szárazáruk', 'Tesco Value szárazáruk', 'Aldi sajátmárkás szárazáruk',
+    'Lidl sajátmárkás szárazáruk', 'CBA sajátmárkás szárazáruk'
+  ],
+  fuszerek: [
+    'bors', 'paprika', 'oregánó', 'bazsalikom', 'fahéj', 'szerecsendió', 'curry', 'chili', 'fokhagymapor', 'gyömbér', 
+    'kömény', 'kakukkfű', 'rozmaring', 'majoranna', 'sáfrány', 'kardamom', 'babérlevél', 'koriander', 'kurkuma', 'ánizs', 
+    'Kotányi fűszerek', 'Erős Pista', 'Piros Arany', 'Horváth Rozi fűszerek', 'Lucullus fűszerek',
+    'őrölt bors', 'egész bors', 'fehér bors', 'fekete bors', 'rózsabors', 'szecsuáni bors',
+    'édes pirospaprika', 'csípős pirospaprika', 'füstölt pirospaprika', 'chili pehely', 'chili por',
+    'fokhagyma granulátum', 'vöröshagyma granulátum', 'zellerpor', 'petrezselyem',
+    'szárított bazsalikom', 'szárított oregánó', 'szárított rozmaring', 'szárított kakukkfű',
+    'szárított zsálya', 'szárított menta', 'szárított kapor', 'szárított snidling',
+    'őrölt fahéj', 'fahéjrúd', 'őrölt szerecsendió', 'egész szerecsendió', 'szegfűszeg',
+    'őrölt gyömbér', 'friss gyömbér', 'wasabi por', 'wasabi paszta',
+    'curry por', 'garam masala', 'tandoori fűszerkeverék', 'öt fűszer keverék',
+    'provence-i fűszerkeverék', 'olasz fűszerkeverék', 'mexikói fűszerkeverék',
+    'BBQ fűszerkeverék', 'steak fűszerkeverék', 'csirke fűszerkeverék',
+    'őrölt kömény', 'egész kömény', 'római kömény', 'őrölt koriander', 'egész koriander',
+    'őrölt kardamom', 'egész kardamom', 'sáfrány', 'kurkuma', 'galangál',
+    'vanília rúd', 'vanília kivonat', 'vanília paszta', 'vanília por',
+    'ánizs', 'csillagánizs', 'édeskömény', 'kapormag',
+    'mustármag', 'szezámmag', 'mák', 'lenmag', 'fenyőmag',
+    'himalája só', 'tengeri só', 'füstölt só', 'fokhagymás só', 'zöldfűszeres só',
+    'citromos bors', 'citromhéj', 'narancshéj', 'lime héj',
+    'füstölt paprika', 'chipotle', 'cayenne bors', 'habanero',
+    'sumac', 'za\'atar', 'dukkah', 'ras el hanout', 'harissa',
+    'vadász fűszerkeverék', 'halászlé fűszerkeverék', 'gulyás fűszerkeverék',
+    'Kotányi Grill Zöldfűszeres', 'Kotányi Grill Magyaros', 'Kotányi Salátafűszer',
+    'Fuchs fűszerek', 'Schwartz fűszerek', 'McCormick fűszerek',
+    'Spar fűszerek', 'Tesco fűszerek', 'Aldi fűszerek', 'Lidl fűszerek'
+  ],
+  snackek: [
+    'chips', 'keksz', 'ropi', 'mogyoró', 'dió', 'pattogatott kukorica', 'csokoládé', 'cukorka', 'energiaszelet', 'nachos', 
+    'tortilla chips', 'mandula', 'kesudió', 'földimogyoró', 'pisztácia', 'gumicukor', 'sós pálcika', 'popcorn', 
+    'Lay\'s chips', 'Chio Chips', 'Balaton szelet', 'Milka csokoládé', 'Haribo gumicukor', 'Oreo keksz', 'Snickers szelet',
+    'Pringles', 'Doritos', 'Tuc keksz', 'Győri Édes keksz', 'Pilóta keksz', 'Abonett extrudált kenyér',
+    'Chio Taccos', 'Cheetos', 'Twix', 'Mars', 'Bounty', 'Kit Kat', 'Kinder Bueno', 'Kinder Chocolate',
+    'M&M\'s', 'Skittles', 'Smarties', 'Ferrero Rocher', 'Raffaello', 'Toffifee', 'Werther\'s Original',
+    'Mamba', 'Mentos', 'Tic Tac', 'Fisherman\'s Friend', 'Halls', 'Negro', 'Ricola',
+    'Airwaves', 'Extra rágó', 'Orbit rágó', 'Hubba Bubba', 'Chewits',
+    'Nestlé Boci', 'Tibi csokoládé', 'Szerencsi csokoládé', 'Stühmer csokoládé',
+    'Sport szelet', 'Túró Rudi', '3Bit', 'Kapucíner', 'Vadász szelet', 'Duna kavics',
+    'Mogyi földimogyoró', 'Mogyi napraforgómag', 'Mogyi tökmag', 'Chio mogyoró',
+    'Ültess fát! kesudió', 'Kalifa aszalt gyümölcsök', 'Seeberger diófélék',
+    'Nobilis étcsokoládé', 'Lindt csokoládé', 'Ritter Sport', 'Toblerone',
+    'Manner nápolyi', 'Loacker nápolyi', 'Napoli nápolyi', 'Balaton szelet',
+    'Belvita reggeliző keksz', 'Győri Édes zabfalatok', 'Nestlé Fitness szelet',
+    'Corny müzliszelet', 'Cerbona müzliszelet', 'Nesquik gabonagolyó',
+    'Cini Minis', 'Chocapic', 'Cheerios', 'Kellogg\'s gabonapelyhek',
+    'Chio Micropop pattogatott kukorica', 'Poppy pattogatott kukorica',
+    'Jack Link\'s beef jerky', 'Fini gumicukor', 'Trolli gumicukor',
+    'Nutline sózott, pirított napraforgómag', 'Győri Édes kréker',
+    'Nógrádi ropi', 'Felix földimogyoró', 'Chio Pom-Bär',
+    'Chio Crusto', 'Chio Big Crunch', 'Chio Intense',
+    'Lay\'s Stax', 'Lay\'s Max', 'Lay\'s Oven Baked',
+    'Doritos Cool American', 'Doritos Nacho Cheese', 'Doritos Sweet Chili Pepper',
+    'Bounty Protein Bar', 'Snickers Protein Bar', 'Mars Protein Bar',
+    'BioTech USA Protein Bar', 'Scitec Nutrition Protein Bar',
+    'Nestlé Yes! gyümölcsös szelet', 'Nestlé Kit Kat Chunky',
+    'Coca-Cola energiaszelet', 'Red Bull energiaszelet',
+    'Monster energiaszelet', 'Hell energiaszelet',
+    'Fit Reggeli müzliszelet', 'Cerbona protein szelet',
+    'Chokito', 'Kókuszcsók', 'Cerbona szelet', 'Nestlé Crunch',
+    'Tesco Value chips', 'Spar Budget snackek', 'Lidl sajátmárkás chips',
+    'Aldi sajátmárkás snackek', 'CBA sajátmárkás rágcsálnivalók'
+  ],
+  italok: [
+    'víz', 'ásványvíz', 'üdítő', 'gyümölcslé', 'kávé', 'tea', 'alkohol', 'sör', 'bor', 'almalé', 'gyümilé', 
+    'coca cola', 'fanta', 'sprite', 'tonik', 'limonádé', 'jeges tea', 'smoothie', 'energiaital', 'pezsgő', 
+    'whisky', 'vodka', 'rum', 'gin', 'szénsavas víz', 'forrásvíz', 'vitamin víz', 'proteinital', 'zöld tea', 
+    'Szentkirályi ásványvíz', 'Nescafé kávé', 'Lipton tea', 'Soproni sör', 'Tokaji bor', 'Theodora ásványvíz', 
+    'Red Bull energiaital', 'Pepsi', 'Nestea', 'Hell energiaital', 'Monster energiaital',
+    'Naturaqua', 'NaturAqua Emotion', 'Mizse víz', 'Visegrádi ásványvíz', 'Vöslauer',
+    'Márka üdítők', 'Sió gyümölcslevek', 'Rauch gyümölcslevek', 'Cappy gyümölcslevek',
+    'Apenta', 'Evian', 'Perrier', 'San Pellegrino', 'Jana', 'Aquarius',
+    'Lavazza kávé', 'Tchibo kávé', 'Bravos kávé', 'Douwe Egberts kávé', 'Segafredo kávé',
+    'Pickwick tea', 'Sir Morton tea', 'Twinings tea', 'Teekanne tea', 'Milford tea',
+    'Arany Ászok sör', 'Borsodi sör', 'Dreher sör', 'Heineken sör', 'Staropramen sör',
+    'Kőbányai sör', 'Steffl sör', 'Gösser sör', 'Carlsberg sör', 'Guinness sör',
+    'Egri bikavér', 'Villányi vörösbor', 'Badacsonyi olaszrizling', 'Irsai Olivér', 'Szekszárdi kadarka',
+    'Törley pezsgő', 'Hungaria pezsgő', 'BB pezsgő', 'Martini Asti', 'Moët & Chandon pezsgő',
+    'Jack Daniel\'s whiskey', 'Johnnie Walker whisky', 'Jameson whiskey', 'Jim Beam bourbon',
+    'Absolut vodka', 'Finlandia vodka', 'Grey Goose vodka', 'Smirnoff vodka',
+    'Bacardi rum', 'Captain Morgan rum', 'Havana Club rum', 'Malibu kókuszlikőr',
+    'Beefeater gin', 'Bombay Sapphire gin', 'Tanqueray gin', 'Gordon\'s gin',
+    'Jägermeister', 'Unicum', 'Baileys', 'Aperol', 'Campari', 'Martini',
+    'Zwack Vilmoskörte pálinka', 'Rézangyal pálinka', 'Szatmári szilvapálinka',
+    'Hubertus', 'St. Hubertus', 'Metaxa', 'Hennessy cognac',
+    'Gere Attila borok', 'Varga borok', 'Csányi pincészet borai', 'Bock borok',
+    'Staropramen', 'Pilsner Urquell', 'Kozel', 'Krušovice', 'Budweiser',
+    'XIXO jeges tea', 'Fuzetea', 'Lipton Ice Tea', 'Nestea',
+    'Bomba energiaital', 'Burn energiaital', 'Rockstar energiaital',
+    'Béres Gyógyszergyár Actival', 'Plusssz pezsgőtabletták', 'Calcium Sandoz pezsgőtabletta',
+    'Ricola gyógynövény cukorkák', 'Halls cukorka', 'Negro cukorka',
+    'Nespresso kávékapszulák', 'Dolce Gusto kávékapszulák', 'Lavazza kávékapszulák',
+    'Maspex Olympos gyümölcslevek', 'Happy Day gyümölcslevek', 'Hohes C gyümölcslevek',
+    'Törley Talisman', 'Kreinbacher pezsgő', 'Garamvári pezsgő',
+    'Kalumba gin', 'Opera gin', 'Árpád pálinka', 'Bolyhos pálinka',
+    'Coca-Cola Zero', 'Pepsi Max', 'Fanta Zero', 'Sprite Zero',
+    'Tesco Value üdítők', 'Spar Budget italok', 'Aldi sajátmárkás italok', 'Lidl sajátmárkás italok'
+  ],
+  haztartasi: [
+    'papírtörlő', 'wc-papír', 'mosószer', 'öblítő', 'szappan', 'sampon', 'fogkrém', 'tisztítószer', 'szivacs', 'szemetes zsák', 
+    'mosogatószer', 'légfrissítő', 'ablaktisztító', 'fertőtlenítő', 'mosogatószivacs', 'felmosó', 'porszívózsák', 'vízkőoldó', 
+    'súrolószer', 'lefolyótisztító', 'Zewa papírtörlő', 'Domestos tisztítószer', 'Jar mosogatószer', 'Silan öblítő', 
+    'Calgon vízlágyító', 'Cif súrolószer', 'Ariel mosószer', 'Lenor öblítő', 'Coccolino öblítő',
+    'Dove szappan', 'Baba szappan', 'Palmolive folyékony szappan', 'Dettol szappan',
+    'Head & Shoulders sampon', 'Pantene sampon', 'Garnier sampon', 'L\'Oreal sampon',
+    'Colgate fogkrém', 'Sensodyne fogkrém', 'Blend-a-med fogkrém', 'Aquafresh fogkrém',
+    'Oral-B fogkefe', 'Colgate fogkefe', 'Sensodyne fogkefe', 'Jordan fogkefe',
+    'Listerine szájvíz', 'Elmex szájvíz', 'Odol-med3 szájvíz',
+    'Gillette borotvapenge', 'Wilkinson borotvapenge', 'BIC borotva',
+    'Nivea dezodor', 'Axe dezodor', 'Rexona dezodor', 'Old Spice dezodor',
+    'Ajax általános tisztítószer', 'Pronto bútorápoló', 'Cillit Bang vízkőoldó',
+    'Vanish folteltávolító', 'Tiret lefolyótisztító', 'Bref WC-tisztító',
+    'Somat mosogatógép tabletta', 'Finish mosogatógép tabletta',
+    'Persil mosókapszula', 'Ariel mosókapszula', 'Tomi mosókapszula',
+    'Quanto öblítő', 'Boost öblítő', 'Flavor öblítő',
+    'Airwick légfrissítő', 'Glade légfrissítő', 'Ambi Pur légfrissítő',
+    'Raid rovarirtó', 'Chemotox rovarirtó', 'Biopon rovarirtó',
+    'Vileda felmosó', 'Vileda törlőkendő', 'Vileda szivacs',
+    'Tomi mosópor', 'Biopon mosópor', 'Persil mosópor',
+    'Clin ablaktisztító', 'Ajax ablaktisztító', 'Seventh Generation ablaktisztító',
+    'Swiffer portalanító', 'Energizer elem', 'Duracell elem',
+    'Tena inkontinencia termékek', 'Always intim betét', 'o.b. tampon',
+    'Libresse intim betét', 'Pampers pelenka', 'Huggies pelenka',
+    'Zewa Deluxe toalettpapír', 'Harmony toalettpapír', 'Nautilus toalettpapír',
+    'Perfex papírtörlő', 'Regina papírtörlő', 'Sindy papír zsebkendő',
+    'Libero pelenka', 'Bella bugyipelenka', 'Segítőkéz gumikesztyű',
+    'Vénusz borotvahab', 'Gillette borotvahab', 'Palmolive tusfürdő',
+    'Fa tusfürdő', 'Nivea tusfürdő', 'Dove tusfürdő',
+    'Veet szőrtelenítő krém', 'Gillette Venus borotva', 'Wilkinson Quattro borotva',
+    'Tesco Value háztartási termékek', 'Spar Budget tisztítószerek',
+    'Aldi sajátmárkás háztartási termékek', 'Lidl W5 tisztítószerek',
+    'CBA háztartási termékek', 'DM Denkmit tisztítószerek', 'Rossmann Domol tisztítószerek'
+  ],
+  egyeb: [
+    'elem', 'izzó', 'gyufa', 'gyertya', 'fólia', 'sütőpapír', 'zacskó', 'állateledel', 'újság', 'magazin', 
+    'képeslap', 'bélyeg', 'ceruzaelem', 'öngyújtó', 'ragasztószalag', 'kötöző', 'alufólia', 'csomagolópapír', 
+    'papírzacskó', 'naptár', 'jegyzetfüzet', 'tollak', 'ceruzák', 'radír', 'Duracell elem', 'Philips izzó', 
+    'Whiskas macskatáp', 'Pedigree kutyatáp', 'Post-it öntapadós jegyzettömb', 'Tesco Value elemek',
+    'Varta elem', 'GP elem', 'Energizer elem', 'Tungsram izzó']
+  };
+
+  function getCategory(item) {
+    const lowercaseItem = item.toLowerCase();
+    for (const [category, keywords] of Object.entries(categories)) {
+      if (keywords.some(keyword => lowercaseItem.includes(keyword))) {
+        return category;
+      }
+    }
+    return 'egyeb';
+  }
+
+  function saveItems() {
+    localStorage.setItem('shoppingList', JSON.stringify(items));
+  }
+
+  function renderList() {
+    shoppingList.innerHTML = '';
+    const groupedItems = groupItemsByCategory(items);
+    
+    for (const [category, categoryItems] of Object.entries(groupedItems)) {
+      const categoryHeader = document.createElement('li');
+      categoryHeader.className = 'category-header';
+      categoryHeader.textContent = getCategoryName(category);
+      shoppingList.appendChild(categoryHeader);
+
+      categoryItems.forEach((item, index) => {
+        const li = document.createElement('li');
+        li.className = 'list-item';
+        li.innerHTML = `
+          <input type="checkbox" ${item.completed ? 'checked' : ''}>
+          <span class="item-text ${item.completed ? 'completed' : ''}">${item.text}</span>
+          <button class="delete-button">Delete</button>
+        `;
+        
+        const checkbox = li.querySelector('input[type="checkbox"]');
+        checkbox.addEventListener('change', () => {
+          item.completed = checkbox.checked;
+          li.querySelector('.item-text').classList.toggle('completed');
+          saveItems();
+        });
+        
+        const deleteButton = li.querySelector('.delete-button');
+        deleteButton.addEventListener('click', () => {
+          items = items.filter(i => i !== item);
+          renderList();
+          saveItems();
+        });
+        
+        shoppingList.appendChild(li);
+      });
+    }
+  }
+
+  function groupItemsByCategory(items) {
+    return items.reduce((acc, item) => {
+      if (!acc[item.category]) {
+        acc[item.category] = [];
+      }
+      acc[item.category].push(item);
+      return acc;
+    }, {});
+  }
+
+  function getCategoryName(category) {
+    const categoryNames = {
+      zoldseg: 'Zöldségek',
+      gyumolcs: 'Gyümölcsök',
+      tejtermek: 'Tejtermékek',
+      pekaru: 'Pékáru',
+      hus: 'Húsok és halak',
+      fagyasztott: 'Fagyasztott termékek',
+      szarazaruk: 'Szárazáruk',
+      fuszerek: 'Fűszerek',
+      snackek: 'Snackek és édességek',
+      italok: 'Italok',
+      haztartasi: 'Háztartási cikkek',
+      egyeb: 'Egyéb'
+    };
+    return categoryNames[category] || 'Egyéb';
+  }
+
+  addButton.addEventListener('click', () => {
+    const text = newItemsTextarea.value.trim();
+    if (text) {
+      const newItems = text.split('\n').filter(item => item.trim() !== '');
+      newItems.forEach(itemText => {
+        items.push({ 
+          text: itemText.trim(), 
+          completed: false,
+          category: getCategory(itemText.trim())
+        });
+      });
+      newItemsTextarea.value = '';
+      renderList();
+      saveItems();
+    }
+  });
+
+  reorderButton.addEventListener('click', () => {
+    items.sort((a, b) => {
+      if (a.category < b.category) return -1;
+      if (a.category > b.category) return 1;
+      return 0;
+    });
+    renderList();
+    saveItems();
+  });
+
+  newItemsTextarea.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && e.ctrlKey) {
+      e.preventDefault();
+      addButton.click();
+    }
+  });
+
+  // Initial render
+  renderList();
+
+  // Add to home screen prompt
+  let deferredPrompt;
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    // Show "Add to Home Screen" button or banner here
+  });
+
+  // You can trigger the prompt later when user clicks on your custom "Add to Home" button
+  function addToHomeScreen() {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      deferredPrompt.userChoice.then((choiceResult) => {
+        if (choiceResult.outcome === 'accepted') {
+          console.log('User accepted the A2HS prompt');
+        }
+        deferredPrompt = null;
+      });
+    }
+  }
+</script>
+</body></html>
