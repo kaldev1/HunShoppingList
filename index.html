@@ -67,7 +67,6 @@
     }
 
     #add-button { background-color: #4CAF50; }
-    #reorder-button { background-color: #2196F3; }
     #remove-all-button { background-color: #f44336; }
     #toggle-learned-button { background-color: #9C27B0; }
 
@@ -195,7 +194,6 @@
       <textarea id="new-items" placeholder="Add items to your list (one per line)"></textarea>
       <div class="button-group">
         <button id="add-button">Add</button>
-        <button id="reorder-button">Reorder</button>
         <button id="remove-all-button">Remove All</button>
         <button id="toggle-learned-button">Learned</button>
       </div>
@@ -211,7 +209,6 @@
   <script>
     const newItemsTextarea = document.getElementById('new-items');
     const addButton = document.getElementById('add-button');
-    const reorderButton = document.getElementById('reorder-button');
     const removeAllButton = document.getElementById('remove-all-button');
     const toggleLearnedButton = document.getElementById('toggle-learned-button');
     const learnedPanel = document.getElementById('learned-keywords-panel');
@@ -331,17 +328,17 @@
 
     const categoryOrder = [
       'italok',
-      'snackek',
       'gyumolcs',
       'zoldseg',
+      'snackek',
       'pekaru',
       'szarazaruk',
       'fuszerek',
       'haztartasi',
       'egyeb',
       'hus',
-      'tejtermek',
-      'fagyasztott'
+      'fagyasztott',
+      'tejtermek'
     ];
 
     const categoryNames = new Map([
@@ -703,19 +700,6 @@
         renderList();
         saveItems();
       }
-    });
-
-    reorderButton.addEventListener('click', () => {
-      items.sort((a, b) => {
-        const categoryOrderA = categoryOrder.indexOf(a.category);
-        const categoryOrderB = categoryOrder.indexOf(b.category);
-        if (categoryOrderA === categoryOrderB) {
-          return a.text.localeCompare(b.text, 'hu');
-        }
-        return categoryOrderA - categoryOrderB;
-      });
-      renderList();
-      saveItems();
     });
 
     removeAllButton.addEventListener('click', () => {
