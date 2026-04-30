@@ -5,18 +5,22 @@
   <title>Shopopedia - Your Smart Shopping List</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    body {
-      font-family: 'Roboto', sans-serif;
+    * {
+      box-sizing: border-box;
       margin: 0;
       padding: 0;
+    }
+
+    body {
+      font-family: 'Roboto', sans-serif;
       background-color: #f0f0f0;
+      font-size: 14px;
     }
 
     .app-container {
       max-width: 800px;
       margin: 0 auto;
       background-color: #ffffff;
-      min-height: 100vh;
       box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     }
 
@@ -24,97 +28,160 @@
       background-color: #4CAF50;
       color: white;
       text-align: center;
-      padding: 1rem;
+      padding: 8px;
     }
 
     h1 {
-      margin: 0;
-      font-size: 1.5rem;
+      font-size: 18px;
     }
 
     .add-item {
-      display: flex;
-      flex-direction: column;
-      padding: 1rem;
+      padding: 8px;
       background-color: #E8F5E9;
     }
 
     #new-items {
-      flex-grow: 1;
-      padding: 0.5rem;
-      font-size: 1rem;
+      width: 100%;
+      padding: 6px;
+      font-size: 14px;
       border: 1px solid #4CAF50;
       border-radius: 4px;
-      min-height: 100px;
-      margin-bottom: 0.5rem;
+      min-height: 50px;
+      margin-bottom: 6px;
+      resize: vertical;
     }
 
     .button-group {
       display: flex;
-      justify-content: space-between;
+      gap: 4px;
     }
 
-    #add-button,
-    #reorder-button {
-      padding: 0.5rem 1rem;
-      font-size: 1rem;
+    .button-group button {
+      flex: 1;
+      padding: 6px 5px;
+      font-size: 12px;
       color: white;
       border: none;
       border-radius: 4px;
       cursor: pointer;
-      flex-grow: 1;
-      margin: 0 0.25rem;
     }
 
-    #add-button {
-      background-color: #4CAF50;
-    }
-
-    #reorder-button {
-      background-color: #2196F3;
-    }
+    #add-button { background-color: #4CAF50; }
+    #reorder-button { background-color: #2196F3; }
+    #remove-all-button { background-color: #f44336; }
+    #toggle-learned-button { background-color: #9C27B0; }
 
     #shopping-list {
       list-style-type: none;
-      padding: 0;
-      margin: 0;
     }
 
     .list-item {
       display: flex;
       align-items: center;
-      padding: 1rem;
+      padding: 5px 8px;
       border-bottom: 1px solid #e0e0e0;
+      gap: 4px;
+      min-height: 32px;
     }
 
-    .list-item:last-child {
-      border-bottom: none;
+    .list-item input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      flex-shrink: 0;
     }
 
     .item-text {
-      flex-grow: 1;
-      margin-left: 0.5rem;
+      flex: 1;
+      min-width: 0;
+      word-break: break-word;
+      font-size: 13px;
     }
 
     .delete-button {
       background-color: #f44336;
       color: white;
       border: none;
-      padding: 0.5rem;
+      padding: 3px 8px;
       border-radius: 4px;
       cursor: pointer;
+      font-size: 11px;
+      flex-shrink: 0;
     }
 
     .completed {
       text-decoration: line-through;
-      color: #888;
+      color: #999;
     }
 
     .category-header {
       background-color: #E8F5E9;
-      padding: 0.5rem;
+      padding: 4px 8px;
       font-weight: bold;
+      font-size: 12px;
       text-transform: capitalize;
+      position: sticky;
+      top: 0;
+    }
+
+    .category-select {
+      padding: 2px 3px;
+      border: 1px solid #4CAF50;
+      border-radius: 4px;
+      font-size: 11px;
+      flex-shrink: 0;
+      max-width: 90px;
+    }
+
+    .learned-panel {
+      background-color: #FFF3E0;
+      padding: 8px;
+      margin: 6px;
+      border-radius: 6px;
+      border: 1px solid #FFCC80;
+      font-size: 12px;
+    }
+
+    .learned-panel h3 {
+      margin-bottom: 6px;
+      color: #E65100;
+      font-size: 13px;
+    }
+
+    .learned-panel p {
+      margin-bottom: 6px;
+    }
+
+    .suggestion-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 4px;
+      margin: 4px 0;
+      background-color: white;
+      border-radius: 4px;
+    }
+
+    .apply-button, .dismiss-button {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      padding: 3px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 11px;
+    }
+
+    .dismiss-button {
+      background-color: #9E9E9E;
+    }
+
+    .correction-count {
+      color: #666;
+      font-size: 11px;
+    }
+
+    #learned-keywords-panel {
+      display: none;
     }
   </style>
 </head>
@@ -127,9 +194,17 @@
     <div class="add-item">
       <textarea id="new-items" placeholder="Add items to your list (one per line)"></textarea>
       <div class="button-group">
-        <button id="add-button">Add Items</button>
-        <button id="reorder-button">Reorder Items</button>
+        <button id="add-button">Add</button>
+        <button id="reorder-button">Reorder</button>
+        <button id="remove-all-button">Remove All</button>
+        <button id="toggle-learned-button">Learned</button>
       </div>
+    </div>
+    <div id="learned-keywords-panel" class="learned-panel">
+      <h3>Learned Keywords</h3>
+      <p>Items you've corrected are tracked below.</p>
+      <div id="suggestions-list"></div>
+      <button id="clear-corrections-button" class="dismiss-button" style="margin-top: 0.5rem;">Clear Corrections</button>
     </div>
     <ul id="shopping-list"></ul>
   </div>
@@ -137,296 +212,121 @@
     const newItemsTextarea = document.getElementById('new-items');
     const addButton = document.getElementById('add-button');
     const reorderButton = document.getElementById('reorder-button');
+    const removeAllButton = document.getElementById('remove-all-button');
+    const toggleLearnedButton = document.getElementById('toggle-learned-button');
+    const learnedPanel = document.getElementById('learned-keywords-panel');
+    const suggestionsList = document.getElementById('suggestions-list');
+    const clearCorrectionsButton = document.getElementById('clear-corrections-button');
     const shoppingList = document.getElementById('shopping-list');
 
     // Load items from local storage
     let items = JSON.parse(localStorage.getItem('shoppingList')) || [];
+    
+    // Load user corrections from localStorage
+    let userCorrections = JSON.parse(localStorage.getItem('userCorrections')) || [];
+    
+    // Load learned keywords from localStorage
+    let learnedKeywords = JSON.parse(localStorage.getItem('learnedKeywords')) || {};
 
-    const categories = {
-      snackek: [
-        'chips', 'keksz', 'ropi', 'mogyoró', 'dió', 'pattogatott kukorica', 'csokoládé', 'cukorka', 'energiaszelet', 'nachos',
-        'tortilla chips', 'mandula', 'kesudió', 'földimogyoró', 'pisztácia', 'gumicukor', 'sós pálcika', 'popcorn',
-        'lay\'s chips', 'chio chips', 'balaton szelet', 'milka csokoládé', 'haribo gumicukor', 'oreo keksz', 'snickers szelet',
-        'pringles', 'doritos', 'tuc keksz', 'győri édes keksz', 'pilóta keksz', 'abonett extrudált kenyér',
-        'chio taccos', 'cheetos', 'twix', 'mars', 'bounty', 'kit kat', 'kinder bueno', 'kinder chocolate',
-        'm&m\'s', 'skittles', 'smarties', 'ferrero rocher', 'raffaello', 'toffifee', 'werther\'s original',
-        'mamba', 'mentos', 'tic tac', 'fisherman\'s friend', 'halls', 'negro', 'ricola',
-        'airwaves', 'extra rágó', 'orbit rágó', 'hubba bubba', 'chewits',
-        'nestlé boci', 'tibi csokoládé', 'szerencsi csokoládé', 'stühmer csokoládé',
-        'sport szelet', 'túró rudi', '3bit', 'kapucíner', 'vadász szelet', 'duna kavics',
-        'mogyi földimogyoró', 'mogyi napraforgómag', 'mogyi tökmag', 'chio mogyoró',
-        'ültess fát! kesudió', 'kalifa aszalt gyümölcsök', 'seeberger diófélék',
-        'nobilis étcsokoládé', 'lindt csokoládé', 'ritter sport', 'toblerone',
-        'manner nápolyi', 'loacker nápolyi', 'napoli nápolyi', 'balaton szelet',
-        'belvita reggeliző keksz', 'győri édes zabfalatok', 'nestlé fitness szelet',
-        'corny müzliszelet', 'cerbona müzliszelet', 'nesquik gabonagolyó',
-        'cini minis', 'chocapic', 'cheerios', 'kellogg\'s gabonapelyhek',
-        'chio micropop pattogatott kukorica', 'poppy pattogatott kukorica',
-        'jack link\'s beef jerky', 'fini gumicukor', 'trolli gumicukor',
-        'nutline sózott, pirított napraforgómag', 'győri édes kréker',
-        'nógrádi ropi', 'felix földimogyoró', 'chio pom-bär',
-        'chio crusto', 'chio big crunch', 'chio intense',
-        'lay\'s stax', 'lay\'s max', 'lay\'s oven baked',
-        'doritos cool american', 'doritos nacho cheese', 'doritos sweet chili pepper',
-        'bounty protein bar', 'snickers protein bar', 'mars protein bar',
-        'biotech usa protein bar', 'scitec nutrition protein bar',
-        'nestlé yes! gyümölcsös szelet', 'nestlé kit kat chunky',
-        'coca-cola energiaszelet', 'red bull energiaszelet',
-        'monster energiaszelet', 'hell energiaszelet',
-        'fit reggeli müzliszelet', 'cerbona protein szelet',
-        'chokito', 'kókuszcsók', 'cerbona szelet', 'nestlé crunch',
-        'tesco value chips', 'spar budget snackek', 'lidl sajátmárkás chips',
-        'aldi sajátmárkás snackek', 'cba sajátmárkás rágcsálnivalók', 'party-mix', 'gabonapehely', 'korpovit', 'macichips'
-      ],
-      italok: [
-        'víz', 'ásványvíz', 'üdítő', 'gyümölcslé', 'kávé', 'tea', 'alkohol', 'sör', 'bor', 'almalé', 'gyümilé',
-        'coca cola', 'fanta', 'sprite', 'tonik', 'limonádé', 'jeges tea', 'smoothie', 'energiaital', 'pezsgő',
-        'whisky', 'vodka', 'rum', 'gin', 'szénsavas víz', 'forrásvíz', 'vitamin víz', 'proteinital', 'zöld tea',
-        'szentkirályi ásványvíz', 'nescafé kávé', 'lipton tea', 'soproni sör', 'tokaji bor', 'theodora ásványvíz',
-        'red bull energiaital', 'pepsi', 'nestea', 'hell energiaital', 'monster energiaital',
-        'naturaqua', 'naturaqua emotion', 'mizse víz', 'visegrádi ásványvíz', 'vöslauer',
-        'márka üdítők', 'sió gyümölcslevek', 'rauch gyümölcslevek', 'cappy gyümölcslevek',
-        'apenta', 'evian', 'perrier', 'san pellegrino', 'jana', 'aquarius',
-        'lavazza kávé', 'tchibo kávé', 'bravos kávé', 'douwe egberts kávé', 'segafredo kávé',
-        'pickwick tea', 'sir morton tea', 'twinings tea', 'teekanne tea', 'milford tea',
-        'arany ászok sör', 'borsodi sör', 'dreher sör', 'heineken sör', 'staropramen sör',
-        'kőbányai sör', 'steffl sör', 'gösser sör', 'carlsberg sör', 'guinness sör',
-        'egri bikavér', 'villányi vörösbor', 'badacsonyi olaszrizling', 'irsai olivér', 'szekszárdi kadarka',
-        'törley pezsgő', 'hungaria pezsgő', 'bb pezsgő', 'martini asti', 'moët & chandon pezsgő',
-        'jack daniel\'s whiskey', 'johnnie walker whisky', 'jameson whiskey', 'jim beam bourbon',
-        'absolut vodka', 'finlandia vodka', 'grey goose vodka', 'smirnoff vodka',
-        'bacardi rum', 'captain morgan rum', 'havana club rum', 'malibu kókuszlikőr',
-        'beefeater gin', 'bombay sapphire gin', 'tanqueray gin', 'gordon\'s gin',
-        'jägermeister', 'unicum', 'baileys', 'aperol', 'campari', 'martini',
-        'zwack vilmoskörte pálinka', 'rézangyal pálinka', 'szatmári szilvapálinka',
-        'hubertus', 'st. hubertus', 'metaxa', 'hennessy cognac',
-        'gere attila borok', 'varga borok', 'csányi pincészet borai', 'bock borok',
-        'staropramen', 'pilsner urquell', 'kozel', 'krušovice', 'budweiser',
-        'xixo jeges tea', 'fuzetea', 'lipton ice tea', 'nestea',
-        'bomba energiaital', 'burn energiaital', 'rockstar energiaital',
-        'béres gyógyszergyár actival', 'plusssz pezsgőtabletták', 'calcium sandoz pezsgőtabletta',
-        'ricola gyógynövény cukorkák', 'halls cukorka', 'negro cukorka',
-        'nespresso kávékapszulák', 'dolce gusto kávékapszulák', 'lavazza kávékapszulák',
-        'maspex olympos gyümölcslevek', 'happy day gyümölcslevek', 'hohes c gyümölcslevek',
-        'törley talisman', 'kreinbacher pezsgő', 'garamvári pezsgő',
-        'kalumba gin', 'opera gin', 'árpád pálinka', 'bolyhos pálinka',
-        'coca-cola zero', 'pepsi max', 'fanta zero', 'sprite zero',
-        'tesco value üdítők', 'spar budget italok', 'aldi sajátmárkás italok', 'lidl sajátmárkás italok', 'multivitamin'
-      ],
-      fagyasztott: [
-        'jégkrém', 'fagyasztott zöldség', 'fagyasztott gyümölcs', 'fagyasztott pizza', 'fagyasztott hús', 'fagyasztott tészta',
-        'fagyasztott készétel', 'fagyasztott hal', 'fagyasztott sütemény', 'fagyasztott pékáru', 'fagyasztott gyümölcskeverék',
-        'fagyasztott burger', 'fagyasztott hasábburgonya', 'fagyasztott garnéla', 'häagen-dazs jégkrém', 'iglo halrudak',
-        'findus fagyasztott zöldségkeverék', 'dr. oetker fagyasztott pizza', 'mccain hasábburgonya', 'algida jégkrém',
-        'carte dor jégkrém', 'ben & jerry\'s jégkrém', 'magnum jégkrém', 'cornetto jégkrém',
-        'fagyasztott csirkemell', 'fagyasztott marha', 'fagyasztott sertés', 'fagyasztott hal filé',
-        'fagyasztott lazac', 'fagyasztott tonhal', 'fagyasztott tintahal', 'fagyasztott garnéla',
-        'fagyasztott zöldborsó', 'fagyasztott kukorica', 'fagyasztott spenót', 'fagyasztott brokkoli',
-        'fagyasztott karfiol', 'fagyasztott vegyes zöldség', 'fagyasztott gyümölcskeverék',
-        'fagyasztott málna', 'fagyasztott eper', 'fagyasztott meggy', 'fagyasztott áfonya',
-        'fagyasztott gombóc', 'fagyasztott nudli', 'fagyasztott galuska', 'fagyasztott nokedli',
-        'fagyasztott lángos', 'fagyasztott rétes', 'fagyasztott pogácsa', 'fagyasztott croissant',
-        'fagyasztott lasagne', 'fagyasztott rakott krumpli', 'fagyasztott túrós tészta',
-        'fagyasztott húsleves', 'fagyasztott zöldségleves', 'fagyasztott gyümölcsleves',
-        'mirelite fagyasztott termékek', 'bonduelle fagyasztott zöldségek',
-        'fevita fagyasztott zöldségek', 'ardo fagyasztott zöldségek',
-        'iglo fagyasztott halak', 'iglo fagyasztott zöldségek', 'iglo fagyasztott készételek',
-        'frosta fagyasztott termékek', 'eismann fagyasztott ételek',
-        'schöller jégkrém', 'mövenpick jégkrém', 'boci jégkrém', 'kaktusz jégkrém',
-        'ardo fagyasztott gyümölcsök', 'spar fagyasztott termékek', 'tesco fagyasztott termékek',
-        'lidl fagyasztott termékek', 'aldi fagyasztott termékek', 'rántott trappista', 'zöldségkeverék', 'dínó', 'kisütős', 'panírozott csirkemell', 'sültkrumpli'
-      ],
-      tejtermek: [
-        'tej', 'sajt', 'joghurt', 'vaj', 'tejföl', 'túró', 'kefir', 'tejszín', 'cottage cheese', 'mascarpone',
-        'mozzarella', 'parmezán', 'feta', 'ricotta', 'camembert', 'brie', 'ementáli', 'krémsajt', 'görög joghurt', 'aludttej',
-        'író', 'tejpor', 'danone activia joghurt', 'danette puding', 'milli tejföl', 'pöttyös túró rudi',
-        'tolle uht tej', 'nádudvari túró', 'zott jogobella', 'pannónia sajt', 'medve sajt', 'karaván sajt', 'tihany camembert',
-        'mizo tejföl', 'mizo tejszín', 'mizo kefir', 'mizo laktózmentes tej', 'mizo protein ital', 'mizo tejberizs',
-        'parmalat tej', 'parmalat tejszín', 'sole-mizo trappista sajt', 'sole-mizo mozzarella', 'sole-mizo vajkrém',
-        'kőröstej hajdú sajt', 'kőröstej grillsajt', 'tolnatej trappista', 'tolnatej vajkrém', 'tolnatej tejföl',
-        'óvártej óvári sajt', 'óvártej karaván sajt', 'óvártej pannónia sajt', 'óvártej trappista sajt',
-        'alföldi tej esl tej', 'alföldi tej kaukázusi kefir', 'alföldi tej natúr joghurt', 'alföldi tej túró',
-        'pilos uht tej', 'pilos tejföl', 'pilos joghurt', 'pilos kefir', 'pilos sajt', 'pilos vaj',
-        'magic milk laktózmentes termékek', 'alpro szójatej', 'alpro mandulatej', 'alpro kókusztej', 'alpro zabtej',
-        'müller riso tejberizs', 'müller milch shake', 'ehrmann high protein pudding', 'ehrmann almighurt',
-        'danone oikos görög joghurt', 'danone actimel', 'danone danonino', 'hochland sajtszeletek', 'hochland krémsajt',
-        'philadelphia krémsajt', 'rama margarin', 'delma margarin', 'flora margarin', 'becel margarin',
-        'lurpak vaj', 'kerrygold ír vaj', 'meggle vajkrém', 'president vaj', 'president camembert',
-        'galbani mozzarella', 'galbani mascarpone', 'galbani ricotta', 'gran moravia parmezán', 'grana padano',
-        'arla sajt', 'arla vaj', 'arla tejszín', 'arla krémsajt', 'savencia karikas sajt', 'savencia medve sajt', 'grízdesszert', 'danette krémpuding', 'pingui', 'rudi'
-      ],
-      hus: [
-        'csirke', 'pulyka', 'marha', 'sertés', 'bárány', 'hal', 'lazac', 'tonhal', 'kolbász', 'szalámi',
-        'sonka', 'bacon', 'kacsa', 'nyúl', 'borjú', 'vadhús', 'füstölt hús', 'virsli',
-        'csirkemell', 'sertéskaraj', 'marhafelsál', 'darált hús', 'pick szalámi', 'gyulai kolbász', 'sága füstli', 'zimbo sonka',
-        'globus májkrém', 'csirkecomb', 'csirkeszárny', 'pulykamell', 'pulykacomb', 'kacsacomb', 'kacsemell',
-        'sertéstarja', 'sertéslapocka', 'sertéscomb', 'marhahátszín', 'marhabélszín', 'marhanyak', 'báránygerinc',
-        'báránycomb', 'pácolt csirkemell', 'pácolt sertéstarja', 'füstölt csülök', 'füstölt tarja', 'füstölt oldalas',
-        'csemege szalámi', 'téliszalámi', 'turista szalámi', 'paprikás szalámi', 'csabai kolbász', 'debreceni kolbász',
-        'lecsókolbász', 'hurka', 'véres hurka', 'májas hurka', 'disznósajt', 'abált szalonna', 'császárszalonna',
-        'angolszalonna', 'tepertő', 'zsír', 'libamáj', 'kacsamáj', 'csirkemáj', 'marhanyelvv', 'pacal', 'velő',
-        'belsőség', 'csontvelő', 'füstölt csülök', 'füstölt tarja', 'füstölt oldalas', 'főtt-füstölt tarja',
-        'parizer', 'mortadella', 'zala felvágott', 'olasz felvágott', 'gépsonka', 'prágai sonka', 'serano sonka',
-        'schwarzwaldi sonka', 'pármai sonka', 'bayonne sonka', 'jamon iberico', 'bresaola', 'pancetta',
-        'szalámirúd', 'chorizo', 'pepperoni', 'pastrami', 'corned beef', 'roastbeef', 'pulled pork', 'pulled chicken',
-        'csirkemell sonka', 'pulykamell sonka', 'csirke nuggets', 'csirke cordon bleu', 'rántott hús', 'saslik', 'kebab',
-        'hamburger pogácsa', 'marhapogácsa', 'csirkepogácsa', 'növényi alapú húshelyettesítő',
-        'pick téliszalámi', 'pick békebeli kolbász', 'pick rákóczi szalámi', 'herz szalámi', 'herz minizán',
-        'kaiser sonka', 'kométa sonka', 'kométa szalámi', 'wiesbauer sonkák', 'wiesbauer felvágottak',
-        'spar budget virsli', 'spar budget párizsi', 'spar budget sonka', 'spar budget szalámi',
-        'lidl pikok színhús sonka', 'lidl pikok szalámi', 'lidl pikok virsli',
-        'aldi kokárdás termékek', 'tesco sajátmárkás húskészítmények',
-        'landhof grillkolbász', 'landhof virsli', 'pápai húskészítmények', 'nagyi titka húskészítmények',
-        'ahida csirkemell sonka', 'ahida pulykamell sonka', 'ahida gépsonka',
-        'nádudvari tanyasi csirke', 'nádudvari pulykamell', 'nádudvari darált hús',
-        'galla sonka', 'galla szalámi', 'galla kolbász', 'szilváshús termékek',
-        'hungerit csirketermékek', 'valdor csirketermékek', 'sága pulykasonka',
-        'gyermelyi csirkemell', 'gyermelyi pulykamell', 'gyulai húskombinát termékek', 'baromfi', 'felvágott', 'hús', 'lapocka', 'tarja', 'karaj', 'csülök', 'comb'
-      ],
-      pekaru: [
-        'kenyér', 'zsemle', 'kifli', 'bagett', 'pita', 'tortilla', 'croissant', 'kalács', 'péksütemény', 'toast kenyér',
-        'ciabatta', 'focaccia', 'briós', 'pogácsa', 'perec', 'muffin', 'palacsinta', 'rétes', 'pizza alap', 'hamburger zsemle',
-        'lipóti kenyér', 'fornetti pogácsa', 'ceres toast kenyér', 'rádi pékség croissant', 'teljes kiőrlésű kenyér',
-        'rozskenyér', 'tönkölykenyér', 'magvas kenyér', 'kovászos kenyér', 'bagel', 'angol muffin', 'hot dog kifli',
-        'kakaós csiga', 'lekváros bukta', 'túrós táska', 'almás rétes', 'meggyes rétes', 'mákos bejgli', 'diós bejgli',
-        'sajtos pogácsa', 'tepertős pogácsa', 'burgonyás pogácsa', 'leveles tészta', 'piskóta', 'piskóta tekercs',
-        'kuglóf', 'gyümölcskenyér', 'csokis muffin', 'áfonyás muffin', 'vaníliás croissant', 'csokis croissant',
-        'fahéjas csiga', 'sajtos rúd', 'sós perec', 'édes perec', 'fonott kalács', 'briós', 'hamburger zsemle',
-        'hot dog kifli', 'szendvics kenyér', 'pirítós kenyér', 'graham kenyér', 'korpás zsemle', 'molnárka',
-        'császárzsemle', 'vizes zsemle', 'szezámmagos zsemle', 'tökmagos zsemle', 'sósperec', 'ropi',
-        'grissini', 'kenyérchips', 'pizzatészta', 'naan kenyér', 'pide', 'lavash', 'matzo', 'chapati',
-        'gluténmentes kenyér', 'gluténmentes zsemle', 'gluténmentes kifli', 'paleo kenyér', 'protein kenyér',
-        'abonett extrudált kenyér', 'balviten gluténmentes pékáru', 'schär gluténmentes termékek',
-        'bonduelle konzerv kukorica', 'globus konzerv zöldborsó', 'eisberg salátakeverék',
-        'első pesti malom lisztek', 'szarvasi malom lisztek', 'goodmills lisztek',
-        'dénes-natura pékáruk', 'mantler pékáruk', 'kemencés pékség termékei', 'jókenyér pékség termékei',
-        'panelkom félkész pékáruk', 'schulstad bakery solutions pékáruk', 'vandemoortele fagyasztott pékáruk', 'péksüti'
-      ],
-      szarazaruk: [
-        'tészta', 'rizs', 'müzli', 'zabpehely', 'liszt', 'cukor', 'só', 'olaj', 'ecet', 'konzervek',
-        'lekvár', 'méz', 'bab', 'lencse', 'csicseriborsó', 'kókuszreszelék', 'makaróni', 'spagetti', 'kuszkusz', 'bulgur',
-        'quinoa', 'szójaszósz', 'paradicsompüré', 'instant leves', 'gyermelyi tészta', 'uncle ben\'s rizs',
-        'cerbona müzli', 'diamant cukor', 'vegeta ételízesítő', 'knorr leveskocka', 'maggi ételízesítő',
-        'penne', 'fusilli', 'farfalle', 'lasagne lap', 'cannelloni', 'tagliatelle', 'gnocchi',
-        'kuszkusz', 'bulgur', 'hajdina', 'köles', 'amaránt', 'quinoa', 'vadrizs',
-        'graham liszt', 'rozsliszt', 'tönkölyliszt', 'rizsliszt', 'kukoricaliszt', 'mandulaliszt',
-        'kókuszliszt', 'burgonyakeményítő', 'kukoricakeményítő', 'pudingpor', 'vaníliás cukor',
-        'porcukor', 'barnacukor', 'nádcukor', 'kókuszvirág cukor', 'xilit', 'eritrit', 'stevia',
-        'napraforgóolaj', 'olívaolaj', 'kókuszolaj', 'lenmagolaj', 'szőlőmagolaj', 'szezámolaj',
-        'balzsamecet', 'almaecet', 'rizsecet', 'fehérborecet', 'vörösborecet',
-        'sűrített paradicsom', 'hámozott paradicsom', 'paradicsompüré', 'ketchup', 'majonéz',
-        'mustár', 'wasabi', 'szójaszósz', 'édes chili szósz', 'barbecue szósz', 'worcester szósz',
-        'tahini', 'mogyoróvaj', 'nutella', 'baracklekvár', 'eperlekvár', 'szilvalekvár',
-        'méz', 'akácméz', 'repceméz', 'hársméz', 'vegyes virágméz', 'manuka méz',
-        'tonhalkonzerv', 'szardíniakonzerv', 'makrélakonzerv', 'lazackonzerv',
-        'zöldborsókonzerv', 'kukoricakonzerv', 'babkonzerv', 'csicseriborsókonzerv', 'lencskonzerv',
-        'ananászkonzerv', 'őszibarackkonzerv', 'cseresznyebefőtt', 'meggybefőtt',
-        'univer ketchup', 'univer majonéz', 'univer mustár', 'globus ketchup', 'globus mustár',
-        'heinz ketchup', 'hellmann\'s majonéz', 'maille mustár',
-        'barilla tészta', 'de cecco tészta', 'buitoni tészta',
-        'riceland rizs', 'scotti rizs', 'rapunzel bio termékek',
-        'dr. oetker pudingpor', 'dr. oetker sütőpor', 'dr. oetker vaníliás cukor',
-        'kotányi fűszerek', 'horváth rozi fűszerek', 'lucullus fűszerek',
-        'spar budget szárazáruk', 'tesco value szárazáruk', 'aldi sajátmárkás szárazáruk',
-        'lidl sajátmárkás szárazáruk', 'cba sajátmárkás szárazáruk', 'sprotni', 'olivabogyó', 'zacskósleves', 'eperlevél', 'májkrém', 'pástétom'
-      ],
-      zoldseg: [
-        'paradicsom', 'uborka', 'paprika', 'répa', 'hagyma', 'fokhagyma', 'burgonya', 'saláta', 'káposzta', 'brokkoli',
-        'karfiol', 'cukkini', 'padlizsán', 'spenót', 'cékla', 'zöldbab', 'kukorica', 'tök', 'zeller', 'karalábé',
-        'retek', 'spárga', 'articsóka', 'paszternák', 'petrezselyem', 'metélőhagyma', 'mángold', 'kelkáposzta', 'édeskömény', 'zöldborsó',
-        'bonduelle konzerv kukorica', 'globus konzerv zöldborsó', 'eisberg salátakeverék', 'csiperke gomba', 'laska gomba', 'shiitake gomba',
-        'lilahagyma', 'újhagyma', 'póréhagyma', 'rukkola', 'jégsaláta', 'római saláta', 'fejes saláta', 'endívia', 'sütőtök', 'patisszon',
-        'zöldfűszerek', 'bazsalikom', 'oregánó', 'kakukkfű', 'rozmaring', 'koriander', 'kapor', 'snidling', 'zsázsa', 'menta',
-        'sárgarépa', 'fehérrépa', 'fekete retek', 'hónapos retek', 'kínai kel', 'bambuszrügy', 'csírák', 'torma', 'wasabi',
-        'bonduelle konzerv bab', 'bonduelle konzerv lencse', 'rege konzerv csemegeuborka', 'rege konzerv cékla', 'univer savanyúság',
-        'bio zöldségek', 'mikrozöldek', 'fagyasztott zöldségkeverék', 'leveszöldség', 'grillzöldség', 'salátamix', 'bébirépa',
-        'koktélparadicsom', 'fürtös pararadicsom', 'szilva paradicsom', 'zöld paradicsom', 'padlizsánkrém', 'guacamole', 'humusz', 'gomba', 'zöldség', 'dudva'
-      ],
-      gyumolcs: [
-        'alma', 'banán', 'narancs', 'citrom', 'körte', 'szőlő', 'eper', 'málna', 'áfonya', 'dinnye',
-        'barack', 'szilva', 'ananász', 'kiwi', 'mangó', 'cseresznye', 'ribizli', 'grapefruit', 'füge', 'datolya',
-        'avokádó', 'gránátalma', 'maracuja', 'licsi', 'mandarin', 'nektarin', 'kókuszdió', 'sárgadinnye', 'papaya', 'guava',
-        'chiquita banán', 'golden delicious alma', 'dole ananász', 'pomelo', 'kumquat', 'csillaggyümölcs', 'pitaya', 'durián',
-        'sárgabarack', 'őszibarack', 'meggy', 'egres', 'fekete ribizli', 'piros ribizli', 'naspolya', 'csipkebogyó', 'kökény', 'som',
-        'birsalma', 'ringló', 'vörös áfonya', 'fekete áfonya', 'szeder', 'homoktövis', 'galagonya', 'berkenye', 'arónia',
-        'zöld citrom', 'yuzu', 'ugli', 'tangelo', 'buddha keze citrom', 'vérnarancs', 'klementin', 'tangerin', 'pomelo',
-        'granny smith alma', 'jonagold alma', 'idared alma', 'gala alma', 'red delicious alma', 'fuji alma', 'pink lady alma',
-        'muskotályszőlő', 'csemegeszőlő', 'magnélküli szőlő', 'fekete szőlő', 'piros szőlő', 'fehér szőlő',
-        'görögdinnye', 'sárgadinnye', 'kantalup dinnye', 'galia dinnye', 'mézdinnye',
-        'aszalt gyümölcsök', 'mazsola', 'aszalt sárgabarack', 'aszalt szilva', 'aszalt áfonya', 'datolya', 'füge',
-        'kandírozott gyümölcsök', 'koktélcseresznye', 'gyümölcssaláta', 'trópusi gyümölcskeverék',
-        'bio gyümölcsök', 'szezonális gyümölcsök', 'héjasgyümölcsök', 'dió', 'mogyoró', 'mandula', 'pisztácia', 'kesudió', 'pekándió', 'gyümi'
-
-      ],
-      fuszerek: [
-        'bors', 'paprika', 'oregánó', 'bazsalikom', 'fahéj', 'szerecsendió', 'curry', 'chili', 'fokhagymapor', 'gyömbér',
-        'kömény', 'kakukkfű', 'rozmaring', 'majoranna', 'sáfrány', 'kardamom', 'babérlevél', 'koriander', 'kurkuma', 'ánizs',
-        'kotányi fűszerek', 'erős pista', 'piros arany', 'horváth rozi fűszerek', 'lucullus fűszerek',
-        'őrölt bors', 'egész bors', 'fehér bors', 'fekete bors', 'rózsabors', 'szecsuáni bors',
-        'édes pirospaprika', 'csípős pirospaprika', 'füstölt pirospaprika', 'chili pehely', 'chili por',
-        'fokhagyma granulátum', 'vöröshagyma granulátum', 'zellerpor', 'petrezselyem',
-        'szárított bazsalikom', 'szárított oregánó', 'szárított rozmaring', 'szárított kakukkfű',
-        'szárított zsálya', 'szárított menta', 'szárított kapor', 'szárított snidling',
-        'őrölt fahéj', 'fahéjrúd', 'őrölt szerecsendió', 'egész szerecsendió', 'szegfűszeg',
-        'őrölt gyömbér', 'friss gyömbér', 'wasabi por', 'wasabi paszta',
-        'curry por', 'garam masala', 'tandoori fűszerkeverék', 'öt fűszer keverék',
-        'provence-i fűszerkeverék', 'olasz fűszerkeverék', 'mexikói fűszerkeverék',
-        'bbq fűszerkeverék', 'steak fűszerkeverék', 'csirke fűszerkeverék',
-        'őrölt kömény', 'egész kömény', 'római kömény', 'őrölt koriander', 'egész koriander',
-        'őrölt kardamom', 'egész kardamom', 'sáfrány', 'kurkuma', 'galangál',
-        'vanília rúd', 'vanília kivonat', 'vanília paszta', 'vanília por',
-        'ánizs', 'csillagánizs', 'édeskömény', 'kapormag',
-        'mustármag', 'szezámmag', 'mák', 'lenmag', 'fenyőmag',
-        'himalája só', 'tengeri só', 'füstölt só', 'fokhagymás só', 'zöldfűszeres só',
-        'citromos bors', 'citromhéj', 'narancshéj', 'lime héj',
-        'füstölt paprika', 'chipotle', 'cayenne bors', 'habanero',
-        'sumac', 'za\'atar', 'dukkah', 'ras el hanout', 'harissa',
-        'vadász fűszerkeverék', 'halászlé fűszerkeverék', 'gulyás fűszerkeverék',
-        'kotányi grill zöldfűszeres', 'kotányi grill magyaros', 'kotányi salátafűszer',
-        'fuchs fűszerek', 'schwartz fűszerek', 'mccormick fűszerek',
-        'spar fűszerek', 'tesco fűszerek', 'aldi fűszerek', 'lidl fűszerek'
-      ],
-      haztartasi: [
-        'papírtörlő', 'wc-papír', 'mosószer', 'öblítő', 'szappan', 'sampon', 'fogkrém', 'tisztítószer', 'szivacs', 'szemetes zsák',
-        'mosogatószer', 'légfrissítő', 'ablaktisztító', 'fertőtlenítő', 'mosogatószivacs', 'felmosó', 'porszívózsák', 'vízkőoldó',
-        'súrolószer', 'lefolyótisztító', 'zewa papírtörlő', 'domestos tisztítószer', 'jar mosogatószer', 'silan öblítő',
-        'calgon vízlágyító', 'cif súrolószer', 'ariel mosószer', 'lenor öblítő', 'coccolino öblítő',
-        'dove szappan', 'baba szappan', 'palmolive folyékony szappan', 'dettol szappan',
-        'head & shoulders sampon', 'pantene sampon', 'garnier sampon', 'l\'oreal sampon',
-        'colgate fogkrém', 'sensodyne fogkrém', 'blend-a-med fogkrém', 'aquafresh fogkrém',
-        'oral-b fogkefe', 'colgate fogkefe', 'sensodyne fogkefe', 'jordan fogkefe',
-        'listerine szájvíz', 'elmex szájvíz', 'odol-med3 szájvíz',
-        'gillette borotvapenge', 'wilkinson borotvapenge', 'bic borotva',
-        'nivea dezodor', 'axe dezodor', 'rexona dezodor', 'old spice dezodor',
-        'ajax általános tisztítószer', 'pronto bútorápoló', 'cillit bang vízkőoldó',
-        'vanish folteltávolító', 'tiret lefolyótisztító', 'bref wc-tisztító',
-        'somat mosogatógép tabletta', 'finish mosogatógép tabletta',
-        'persil mosókapszula', 'ariel mosókapszula', 'tomi mosókapszula',
-        'quanto öblítő', 'boost öblítő', 'flavor öblítő',
-        'airwick légfrissítő', 'glade légfrissítő', 'ambi pur légfrissítő',
-        'raid rovarirtó', 'chemotox rovarirtó', 'biopon rovarirtó',
-        'vileda felmosó', 'vileda törlőkendő', 'vileda szivacs',
-        'tomi mosópor', 'biopon mosópor', 'persil mosópor',
-        'clin ablaktisztító', 'ajax ablaktisztító', 'seventh generation ablaktisztító',
-        'swiffer portalanító', 'energizer elem', 'duracell elem',
-        'tena inkontinencia termékek', 'always intim betét', 'o.b. tampon',
-        'libresse intim betét', 'pampers pelenka', 'huggies pelenka',
-        'zewa deluxe toalettpapír', 'harmony toalettpapír', 'nautilus toalettpapír',
-        'perfex papírtörlő', 'regina papírtörlő', 'sindy papír zsebkendő',
-        'libero pelenka', 'bella bugyipelenka', 'segítőkéz gumikesztyű',
-        'vénusz borotvahab', 'gillette borotvahab', 'palmolive tusfürdő',
-        'fa tusfürdő', 'nivea tusfürdő', 'dove tusfürdő',
-        'veet szőrtelenítő krém', 'gillette venus borotva', 'wilkinson quattro borotva',
-        'tesco value háztartási termékek', 'spar budget tisztítószerek',
-        'aldi sajátmárkás háztartási termékek', 'lidl w5 tisztítószerek',
-        'cba háztartási termékek', 'dm denkmit tisztítószerek', 'rossmann domol tisztítószerek'
-      ],
-      egyeb: [
-        'elem', 'izzó', 'gyufa', 'gyertya', 'fólia', 'sütőpapír', 'zacskó', 'állateledel', 'újság', 'magazin',
-        'képeslap', 'bélyeg', 'ceruzaelem', 'öngyújtó', 'ragasztószalag', 'kötöző', 'alufólia', 'csomagolópapír',
-        'papírzacskó', 'naptár', 'jegyzetfüzet', 'tollak', 'ceruzák', 'radír', 'duracell elem', 'philips izzó',
-        'whiskas macskatáp', 'pedigree kutyatáp', 'post-it öntapadós jegyzettömb', 'tesco value elemek',
-        'varta elem', 'gp elem', 'energizer elem', 'tungsram izzó', 'zokni']
+// Semantic product categorization system
+    // Instead of hardcoded lists, we use product characteristics and patterns
+    
+    const productCategories = {
+      patterns: {
+        italok: {
+          keywords: ['víz', 'ital', 'sör', 'bor', 'pálinka', 'rum', 'vodka', 'gin', 'whisky', 'likőr',
+                     'kávé', 'tea', 'hárstea', 'kávékapszula', 'cola', 'pepsi', 'üdítő', 'lé', 'almalé',
+                     'gyümölcslé', 'szörp', 'forrócsoki', 'szósz', 'nyálka'],
+          indicators: ['ml', 'dl', 'l', 'pet', 'liter', 'csap', 'üveg', 'doboz', 'karton'],
+          subtractive: ['szósz', 'lekvár', 'méz', 'olaj', 'ecet']
+        },
+        snackek: {
+          keywords: ['chip', 'keksz', 'ropi', 'mogyoró', 'dió', 'rágó', 'gumicukor', 'cukorka', 'szelet',
+                     'csoki', 'csokoládé', 'popcorn', 'nacho', 'energiaszelet', 'müzliszelet', 'rudi',
+                     'túrórudi', 'tejszelet', 'krékermix', 'gabonapehely', 'korpovit', 'bar'],
+          indicators: ['gramm', 'g', 'pack', 'csomag', 'doboz', 'szalámi', 'szelet'],
+          pairs: ['lay', 'doritos', 'pringles', 'chio', 'bounty', 'snickers', 'mars', 'twix', 'milka', 'kinder']
+        },
+        zoldseg: {
+          keywords: ['paradicsom', 'uborka', 'paprika', 'répa', 'hagyma', 'fokhagyma', 'saláta', 'káposzta',
+                     'brokkoli', 'karfiol', 'cukkini', 'padlizsán', 'spenót', 'burgonya', 'gomba', 'zöld',
+                     'retek', 'spárga', 'articsóka', 'paszternák', 'zeller', 'karalábé', 'petrezselyem',
+                     'kukorica', 'ubi', 'krumpli', 'édesburi', 'kínai', 'kel', 'mángold'],
+          indicators: ['kg', 'gramm', 'db', 'szál', 'csomag', 'kosár', 'friss'],
+          subtractive: ['fagyasztott']
+        },
+        gyumolcs: {
+          keywords: ['alma', 'banán', 'narancs', 'citrom', 'körte', 'szőlő', 'eper', 'málna', 'dinnye',
+                     'barack', 'szilva', 'ananász', 'kiwi', 'mangó', 'cseresznye', 'áfonya', 'őszibarack',
+                     'grapefruit', 'avokádó', 'gyümölcs', 'gyümi', 'befőtt', 'limonádé', 'sárgabarack',
+                     'mandarin', 'pomeló'],
+          indicators: ['kg', 'gramm', 'db', 'kosár', 'friss', 'bio'],
+          subtractive: ['fagyasztott', 'aszalt']
+        },
+        hus: {
+          keywords: ['csirke', 'pulyka', 'marha', 'sertés', 'bárány', 'hal', 'lazac', 'tonhal',
+                     'kolbász', 'szalámi', 'sonka', 'virsli', 'bacon', 'hús', 'baromfi', 'húskészítmény',
+                     'felvágott', 'hurka', 'tepertő', 'máj', 'nyúl', 'kacsa', 'fasírt', 'fasirt',
+                     'lapocka', 'karaj', 'tarja', 'oldalas', 'csülök', 'comb', 'farhát', 'párizsi',
+                     'szalonna', 'pástétom'],
+          indicators: ['kg', 'gramm', 'db', 'darab', 'csomag', 'friss', 'fagyasztott', 'füstölt'],
+          subtractive: ['fagyasztott']
+        },
+        tejtermek: {
+          keywords: ['tej', 'joghurt', 'sajt', 'vaj', 'tejföl', 'túró', 'kefir', 'tejszín', 'mozzarella',
+                     'parmezán', 'feta', 'ricotta', 'camembert', 'brie', 'ementáli', 'krémsajt', 'mascarpone',
+                     'cottage', 'vajkrém', 'margarin', 'trappista', 'tömlős', 'kockasajt', 'krémfehér',
+                     'parenyica', 'actimel', 'monte', 'puding', 'dessert'],
+          indicators: ['ml', 'gramm', 'db', 'csomag', 'doboz', 'uht', 'friss'],
+          subtractive: ['fagyasztott']
+        },
+        pekaru: {
+          keywords: ['kenyér', 'zsemle', 'kifli', 'bagett', 'pita', 'tortilla', 'croissant', 'kalács',
+                     'pogácsa', 'perec', 'muffin', 'rétes', 'pizza', 'burger', 'Hot-dog', 'ciabatta',
+                     'focaccia', 'bejgli', 'bukta', 'táska', 'péksüti', 'pékáru', 'buci', 'stangli',
+                     'baguette', 'cipó', 'fánk', 'gofri'],
+          indicators: ['db', 'darab', 'csomag', 'doboz', 'friss', 'pékség'],
+          subtractive: ['fagyasztott']
+        },
+        szarazaruk: {
+          keywords: ['tészta', 'rizs', 'müzli', 'zabpehely', 'liszt', 'cukor', 'só', 'olaj', 'ecet',
+                     'konzérv', 'lekvár', 'méz', 'bab', 'lencse', 'csicseriborsó', 'kókusz', 'keményítő',
+                     'szósz', 'majonéz', 'mustár', 'ketchup', 'vaj', 'tahini', 'nut', 'leves',
+                     'leveskocka', 'buljón', 'instant', 'griz', 'bulgur', 'spagetti', 'makaróni',
+                     'cérnametélt', 'csigatészta', 'betűtészta', 'csipetke', 'paradicsompüré',
+                     'passzírozott paradicsom', 'bolognai', 'tojás', 'élesztő'],
+          indicators: ['ml', 'gramm', 'db', 'csomag', 'doboz', 'dobozos', 'konzérv'],
+          subtractive: []
+        },
+        fuszerek: {
+          keywords: ['bors', 'paprika', 'fűszer', 'oregánó', 'bazsalikom', 'fahéj', 'szerecsendió',
+                     'curry', 'chili', 'fokhagyma', 'gyömbér', 'kömény', 'kakukkfű', 'rozmaring',
+                     'majoranna', 'sáfrány', 'kardamom', 'babérlevél', 'koriander', 'kurkuma', 'ánizs',
+                     'vanília', 'vaníliáscukor', 'granulátum', 'metélőhagyma', 'gyros', 'szezám', 'mák'],
+          indicators: ['gramm', 'g', 'por', 'rúd', 'fűszer', 'szárított'],
+          subtractive: []
+        },
+        fagyasztott: {
+          keywords: ['fagyasztott', 'jégkrém', 'fagyi', 'fagyott', 'algida', 'carte dor', 'magnum',
+                     'hasábburi', 'hasábburgonya', 'halrudacska', 'nuggets', 'rántott', 'burgonyapárna',
+                     'zöldségkeverék', 'serpenyős'],
+          indicators: ['fagyasztott', 'frozen', 'fagyasztó'],
+          subtractive: []
+        },
+        haztartasi: {
+          keywords: ['papír', 'papírtörlő', 'wc', 'mosószer', 'öblítő', 'szappan', 'sampon', 'fogkrém',
+                     'tisztítószer', 'szivacs', 'mosogatószer', 'légfrissítő', 'ablaktisztító', 'rá­vartartási',
+                     'pelenka', 'betét', 'dezodor', 'borotva', 'sütőpapír', 'fólia', 'elem', 'batterija',
+                     'izzó', 'zsebkendő', 'zsepi', 'tusfürdő', 'persil', 'pellet', 'széna', 'toalettpapír'],
+          indicators: ['csomag', 'doboz', 'darab', 'db', 'szalámi', 'csomag'],
+          subtractive: []
+        },
+        egyeb: {
+          keywords: [],
+          indicators: [],
+          subtractive: []
+        }
+      }
     };
 
     const categoryOrder = [
@@ -444,18 +344,266 @@
       'fagyasztott'
     ];
 
+    const categoryNames = new Map([
+      ['zoldseg', 'Zöldségek'],
+      ['gyumolcs', 'Gyümölcsök'],
+      ['tejtermek', 'Tejtermékek'],
+      ['pekaru', 'Pékáru'],
+      ['hus', 'Húsok és halak'],
+      ['fagyasztott', 'Fagyasztott termékek'],
+      ['szarazaruk', 'Szárazáruk'],
+      ['fuszerek', 'Fűszerek'],
+      ['snackek', 'Snackek és édességek'],
+      ['italok', 'Italok'],
+      ['haztartasi', 'Háztartási cikkek'],
+      ['egyeb', 'Egyéb']
+    ]);
+
+    function normalizeText(text) {
+      return text
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^\p{L}\p{N}]+/gu, ' ')
+        .trim();
+    }
+
+    function keywordMatches(item, keyword) {
+      if (!keyword) return false;
+      if (keyword.length <= 3) {
+        return new RegExp(`(^|\\s)${keyword}(\\s|$)`).test(item);
+      }
+      return item.includes(keyword);
+    }
+
+    const directCategoryMatches = [
+      ['szarazaruk', ['heringfile szoszban', 'eperszalag']],
+      ['italok', ['gyumile', 'sio piros gyumi', 'szobi piros szolo', 'bubis viz',
+                  'viz mentes bubis', 'mentes bubis']],
+      ['fagyasztott', ['hasabburi', 'hasabburgonya', 'halrudacska', 'rantott trappista', 'rantott hal',
+                       'ripp ropp nuggets', 'nuggets', 'burgonyaparna', 'serpenyos zoldseg',
+                       'azsiai zoldsegkeverek', 'hullamos hasabburgonya', 'inyenc halfile',
+                       'heringfile', 'dinofasirt', 'dino fasirt', 'gyumolcsleves alap',
+                       'piros gyumolcs keverek', 'ropogos halszeletek', 'brokkoli mix', 'fasirt']],
+      ['hus', ['sajtosvirsli', 'virsli sajtos', 'fustli', 'frankfurti', 'fasirt', 'daralthus',
+               'dino fasirt', 'parizsi', 'baromfirud', 'szendvicssonka', 'uzsonnasonka',
+               'halas pastetom', 'heringfile', 'husi', 'gyulai kolbasz szeletelt',
+               'karaj csaszarlanccal papszelettel', 'tatra szelet']],
+      ['tejtermek', ['tejfol', 'vajkrem', 'kaveszin', 'tejszinhab', 'teavaj', 'turo', 'turogomboc',
+                     'toltott rudi', 'kremturo', 'kremfeher sajt', 'tomlos sajt', 'kockasajt',
+                     'sajtkorong', 'trappista', 'apetina', 'parenyica', 'actimel', 'monte',
+                     'bords eve sos', 'torta', 'pingui', 'rudi', 'turorudi', 'tejszelet']],
+      ['snackek', ['gofri']],
+      ['pekaru', ['peksuti', 'hamburgerbuci', 'toastkenyer', 'toast kenyer', 'baguette', 'rozscipo',
+                  'stangli', 'pogacsa', 'fank', 'almas haromszog', 'barackos pudingos parna',
+                  'tepertos hatszog', 'puffancs', 'kovaszos']],
+      ['szarazaruk', ['szoszpor', 'paradicsompure', 'passzirozott paradicsom', 'bolognai por',
+                      'levesmix', 'leveszoldseg alap', 'csigateszta', 'cermametelt', 'betuteszta',
+                      'leves teszta', 'leveszoldseg', 'porkoltteszta', 'pöriteszta', 'koretteszta',
+                      'makaroniteszta', 'kokuszreszelek', 'barack befott', 'oszibarackbefott',
+                      'harsmez', 'nutella', 'tasakos rizs', 'hars tea', 'harstea', 'forrocsoki',
+                      'ludgege', 'mazsola', 'kave', 'kavetejszin', 'tea']],
+      ['fuszerek', ['gyros fuszer', 'feketebors', 'fokhagyma granulatum', 'metelohagyma',
+                    'vaniliascukor', 'bors orolt']],
+      ['gyumolcs', ['gyumi', 'gyumolcs', 'piros gyumi', 'piros gyumolcs', 'afonya', 'szolo']],
+      ['zoldseg', ['ubi', 'edesburi', 'krumpli', 'koktelparadicsom', 'mini paradicsom',
+                   'szilvaparadicsom', 'leveszoldseg', 'petrezselyemzold', 'csemegekukorica',
+                   'savanyukaposzta', 'dudva barninak', 'paprika piros', 'piros paprika']],
+      ['italok', ['asvanyviz', 'bubis viz', 'mentes bubis', 'gyumile', 'gyumolcsle', 'almalé',
+                  'almale', 'hey ho', 'sio', 'szobi', 'szorp', 'pepsi', 'izesitett sor',
+                  'izesitett lotyi', 'sio piros gyumi', 'szobi piros szolo', 'viz mentes bubis',
+                  'piros']],
+      ['snackek', ['turo rudi', 'turorudi', 'rudi', 'tejszelet', 'pingui', 'tatraszelet',
+                   'tatra szelet', 'milka', 'merci', 'kinder', 'csokinyul', 'macichips',
+                   'krekermix', 'korpovit']],
+      ['haztartasi', ['wc papir', 'papirtorlo', 'zsepi', 'zsebkendo', 'tusfurdo', 'persil',
+                      'pellet', 'szena']]
+    ];
+
+    const subtractiveMap = new Map(
+      Object.entries(productCategories.patterns).map(([cat, p]) => [cat, new Set((p.subtractive || []).map(normalizeText))])
+    );
+
+    const keywordsMap = new Map(
+      Object.entries(productCategories.patterns).map(([cat, p]) => [cat, p.keywords.map(normalizeText)])
+    );
+
+    const pairsMap = new Map(
+      Object.entries(productCategories.patterns).map(([cat, p]) => [cat, (p.pairs || []).map(normalizeText)])
+    );
+
+    const categories = ['italok', 'snackek', 'pekaru', 'fagyasztott', 'tejtermek', 'hus', 
+                        'szarazaruk', 'gyumolcs', 'zoldseg', 'fuszerek', 'haztartasi', 'egyeb'];
+
     function getCategory(item) {
-      const lowercaseItem = item.toLowerCase();
-      for (const [category, keywords] of Object.entries(categories)) {
-        if (keywords.some(keyword => lowercaseItem.includes(keyword))) {
+      const normalizedItem = normalizeText(item);
+      
+      for (const [keyword, category] of Object.entries(learnedKeywords)) {
+        if (normalizedItem.includes(normalizeText(keyword))) {
           return category;
         }
       }
+      
+      for (const [category, phrases] of directCategoryMatches) {
+        if (phrases.some(phrase => normalizedItem.includes(normalizeText(phrase)))) {
+          return category;
+        }
+      }
+      
+      if (normalizedItem.startsWith('fagyasztott')) {
+        return 'fagyasztott';
+      }
+      
+      for (const category of categories) {
+        const subtractive = subtractiveMap.get(category);
+        if (subtractive && subtractive.size > 0) {
+          let shouldSkip = false;
+          for (const subKeyword of subtractive) {
+            if (keywordMatches(normalizedItem, subKeyword)) {
+              shouldSkip = true;
+              break;
+            }
+          }
+          if (shouldSkip) continue;
+        }
+        
+        const keywords = keywordsMap.get(category);
+        if (keywords) {
+          for (const keyword of keywords) {
+            if (keywordMatches(normalizedItem, keyword)) {
+              return category;
+            }
+          }
+        }
+        
+        const pairs = pairsMap.get(category);
+        if (pairs) {
+          for (const pair of pairs) {
+            if (keywordMatches(normalizedItem, pair)) {
+              return category;
+            }
+          }
+        }
+      }
+      
+      for (const category of categories) {
+        const keywords = keywordsMap.get(category);
+        if (keywords) {
+          for (const keyword of keywords) {
+            if (keywordMatches(normalizedItem, keyword)) {
+              return category;
+            }
+          }
+        }
+      }
+      
       return 'egyeb';
+    }
+
+    function getCategoryName(category) {
+      return categoryNames.get(category) || 'Egyéb';
     }
 
     function saveItems() {
       localStorage.setItem('shoppingList', JSON.stringify(items));
+    }
+    
+    function saveCorrections() {
+      localStorage.setItem('userCorrections', JSON.stringify(userCorrections));
+    }
+    
+    function saveLearnedKeywords() {
+      localStorage.setItem('learnedKeywords', JSON.stringify(learnedKeywords));
+    }
+    
+    function recordCorrection(itemText, oldCategory, newCategory) {
+      userCorrections.push({
+        item: itemText,
+        oldCategory: oldCategory,
+        newCategory: newCategory,
+        timestamp: Date.now()
+      });
+      saveCorrections();
+      renderSuggestions();
+    }
+
+    function renderSuggestions() {
+      suggestionsList.innerHTML = '';
+      
+      // Group corrections by item text
+      const correctionMap = {};
+      userCorrections.forEach(c => {
+        const key = c.item.toLowerCase();
+        if (!correctionMap[key]) {
+          correctionMap[key] = { item: c.item, corrections: [] };
+        }
+        correctionMap[key].corrections.push(c);
+      });
+      
+      // Find items corrected multiple times to the same category
+      const suggestions = [];
+      for (const [key, data] of Object.entries(correctionMap)) {
+        const categoryCounts = {};
+        data.corrections.forEach(c => {
+          categoryCounts[c.newCategory] = (categoryCounts[c.newCategory] || 0) + 1;
+        });
+        
+        for (const [category, count] of Object.entries(categoryCounts)) {
+          if (count >= 2) {
+            suggestions.push({
+              item: data.item,
+              category: category,
+              count: count,
+              oldCategory: data.corrections[0].oldCategory
+            });
+          }
+        }
+      }
+      
+      if (suggestions.length === 0) {
+        suggestionsList.innerHTML = '<p>No suggestions yet. Correct item categories to help the app learn.</p>';
+        return;
+      }
+      
+      suggestions.forEach(suggestion => {
+        const div = document.createElement('div');
+        div.className = 'suggestion-item';
+        
+        const textWrapper = document.createElement('div');
+        const strong = document.createElement('strong');
+        strong.textContent = suggestion.item;
+        const br = document.createElement('br');
+        const span = document.createElement('span');
+        span.className = 'correction-count';
+        span.textContent = `Corrected ${suggestion.count}× from ${getCategoryName(suggestion.oldCategory)} → ${getCategoryName(suggestion.category)}`;
+        textWrapper.appendChild(strong);
+        textWrapper.appendChild(br);
+        textWrapper.appendChild(span);
+        
+        const buttonWrapper = document.createElement('div');
+        const applyButton = document.createElement('button');
+        applyButton.className = 'apply-button';
+        applyButton.dataset.item = suggestion.item;
+        applyButton.dataset.category = suggestion.category;
+        applyButton.textContent = 'Apply';
+        buttonWrapper.appendChild(applyButton);
+        
+        div.appendChild(textWrapper);
+        div.appendChild(buttonWrapper);
+        suggestionsList.appendChild(div);
+      });
+      
+      document.querySelectorAll('.apply-button').forEach(button => {
+        button.addEventListener('click', () => {
+          const item = button.dataset.item;
+          const category = button.dataset.category;
+          learnedKeywords[item.toLowerCase()] = category;
+          saveLearnedKeywords();
+          renderSuggestions();
+          button.textContent = '✓ Applied';
+          button.disabled = true;
+        });
+      });
     }
 
     function renderList() {
@@ -475,21 +623,50 @@
           groupedItems[category].forEach((item) => {
             const li = document.createElement('li');
             li.className = 'list-item';
-            li.innerHTML = `
-            <input type="checkbox" ${item.completed ? 'checked' : ''}>
-            <span class="item-text ${item.completed ? 'completed' : ''}">${item.text}</span>
-            <button class="delete-button">Delete</button>
-          `;
+            
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            if (item.completed) checkbox.checked = true;
+            
+            const span = document.createElement('span');
+            span.className = 'item-text' + (item.completed ? ' completed' : '');
+            span.textContent = item.text;
+            
+            const select = document.createElement('select');
+            select.className = 'category-select';
+            select.title = 'Change category';
+            categoryOrder.forEach(cat => {
+              const option = document.createElement('option');
+              option.value = cat;
+              option.textContent = getCategoryName(cat);
+              if (cat === item.category) option.selected = true;
+              select.appendChild(option);
+            });
+            
+            const deleteBtn = document.createElement('button');
+            deleteBtn.className = 'delete-button';
+            deleteBtn.textContent = 'Delete';
+            
+            li.appendChild(checkbox);
+            li.appendChild(span);
+            li.appendChild(select);
+            li.appendChild(deleteBtn);
 
-            const checkbox = li.querySelector('input[type="checkbox"]');
             checkbox.addEventListener('change', () => {
               item.completed = checkbox.checked;
-              li.querySelector('.item-text').classList.toggle('completed');
+              span.classList.toggle('completed', item.completed);
               saveItems();
             });
 
-            const deleteButton = li.querySelector('.delete-button');
-            deleteButton.addEventListener('click', () => {
+            select.addEventListener('change', () => {
+              const oldCategory = item.category;
+              item.category = select.value;
+              recordCorrection(item.text, oldCategory, item.category);
+              renderList();
+              saveItems();
+            });
+
+            deleteBtn.addEventListener('click', () => {
               items = items.filter(i => i !== item);
               renderList();
               saveItems();
@@ -509,24 +686,6 @@
         acc[item.category].push(item);
         return acc;
       }, {});
-    }
-
-    function getCategoryName(category) {
-      const categoryNames = {
-        zoldseg: 'Zöldségek',
-        gyumolcs: 'Gyümölcsök',
-        tejtermek: 'Tejtermékek',
-        pekaru: 'Pékáru',
-        hus: 'Húsok és halak',
-        fagyasztott: 'Fagyasztott termékek',
-        szarazaruk: 'Szárazáruk',
-        fuszerek: 'Fűszerek',
-        snackek: 'Snackek és édességek',
-        italok: 'Italok',
-        haztartasi: 'Háztartási cikkek',
-        egyeb: 'Egyéb'
-      };
-      return categoryNames[category] || 'Egyéb';
     }
 
     addButton.addEventListener('click', () => {
@@ -559,6 +718,15 @@
       saveItems();
     });
 
+    removeAllButton.addEventListener('click', () => {
+      if (items.length === 0) return;
+      if (confirm('Remove all items from the list?')) {
+        items = [];
+        renderList();
+        saveItems();
+      }
+    });
+
     newItemsTextarea.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' && e.ctrlKey) {
         e.preventDefault();
@@ -566,8 +734,32 @@
       }
     });
 
+    // Toggle learned keywords panel
+    toggleLearnedButton.addEventListener('click', () => {
+      if (learnedPanel.style.display === 'none' || learnedPanel.style.display === '') {
+        learnedPanel.style.display = 'block';
+        toggleLearnedButton.textContent = 'Hide';
+        renderSuggestions();
+      } else {
+        learnedPanel.style.display = 'none';
+        toggleLearnedButton.textContent = 'Learned';
+      }
+    });
+
+    // Clear all corrections
+    clearCorrectionsButton.addEventListener('click', () => {
+      if (confirm('Are you sure you want to clear all corrections and learned keywords?')) {
+        userCorrections = [];
+        learnedKeywords = {};
+        saveCorrections();
+        saveLearnedKeywords();
+        renderSuggestions();
+      }
+    });
+
     // Initial render
     renderList();
+    renderSuggestions();
 
     // Add to home screen prompt
     let deferredPrompt;
